@@ -3,7 +3,7 @@ FROM eclipse-temurin:17-jre-alpine
 RUN mkdir /opt/app
 WORKDIR /opt/app
 
-COPY ./target/mix-node-*.jar mix-node.jar
+COPY ./target/latte-mixxiato.mix-*.jar mix.jar
 
 EXPOSE 8888
-ENTRYPOINT ["java", "-jar", "./mix-node.jar", "8888"]
+ENTRYPOINT ["java", "-jar", "./mix.jar", "8888"]
