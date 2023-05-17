@@ -2,7 +2,6 @@ package edu.kit.tm.ps.latte_mixxiato.mix;
 
 import com.robertsoultanaev.javasphinx.SphinxClient;
 import com.robertsoultanaev.javasphinx.SphinxNode;
-import com.robertsoultanaev.javasphinx.SphinxParams;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Router;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -13,8 +12,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-import java.math.BigInteger;
-
 public class Server {
 
     private final int port;
@@ -22,11 +19,10 @@ public class Server {
     private final SphinxNode node;
     private final Router router;
 
-    public Server(final int port, final BigInteger mixKey, final Router router) {
+    public Server(final int port, final SphinxClient client, final SphinxNode node, final Router router) {
         this.port = port;
-        final var params = new SphinxParams();
-        this.client = new SphinxClient(params);
-        this.node = new SphinxNode(params, mixKey);
+        this.client = client;
+        this.node = node;
         this.router = router;
     }
 

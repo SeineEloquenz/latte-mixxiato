@@ -1,10 +1,9 @@
 package edu.kit.tm.ps.latte_mixxiato.mix;
 
-import com.robertsoultanaev.javasphinx.SphinxClient;
-import com.robertsoultanaev.javasphinx.SphinxParams;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.CoordinatorMixNodeRepository;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Router;
+import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -23,15 +22,13 @@ public class Main {
         final var privateKey = new BigInteger(args[1]);
         final var coordinatorConfig = CoordinatorConfig.load();
 
-        //Setup dependencies we need
-        final var params = new SphinxParams(); //TODO set realistic parameters or get from coordinator
-        final var sphinxClient = new SphinxClient(params);
+        final var sphinxFactory = new DefaultSphinxFactory(); //TODO set realistic parameters or get from coordinator
         final var mixRepository = new CoordinatorMixNodeRepository(coordinatorConfig);
         mixRepository.sync();
-        final var router = new Router(mixRepository, sphinxClient);
+        final var router = new Router(mixRepository, sphinxFactory.client());
 
         //Actual server startup
-        final var server = new Server(port, privateKey, router);
+        final var server = new Server(port, sphinxFactory.client(), sphinxFactory.node(privateKey), router);
         try {
             server.run();
         } catch (InterruptedException e) {

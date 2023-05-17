@@ -1,11 +1,10 @@
 package edu.kit.tm.ps.latte_mixxiato.dead_drop;
 
-import com.robertsoultanaev.javasphinx.SphinxClient;
-import com.robertsoultanaev.javasphinx.SphinxParams;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Receiver;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.CoordinatorMixNodeRepository;
+import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
@@ -21,8 +20,9 @@ public class Main {
         final var port = Integer.parseInt(args[0]);
         final var coordinatorConfig = CoordinatorConfig.load();
 
+        final var sphinxFactory = new DefaultSphinxFactory();
         final var mixNodeRepository = new CoordinatorMixNodeRepository(coordinatorConfig);
-        final var endpoint = new Endpoint(mixNodeRepository, 3, new SphinxClient(new SphinxParams()));
+        final var endpoint = new Endpoint(mixNodeRepository, 3, sphinxFactory.client());
         final var receiver = new Receiver(assembledMessage -> System.out.println(new String(assembledMessage.messageBody(), StandardCharsets.UTF_8)));
 
         //Actual server startup

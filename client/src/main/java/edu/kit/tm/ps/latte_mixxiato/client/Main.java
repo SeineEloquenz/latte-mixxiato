@@ -6,6 +6,7 @@ import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Sender;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.CoordinatorMixNodeRepository;
+import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -28,12 +29,11 @@ public class Main {
 
         final var messages = Arrays.stream(args).skip(2).toList();
 
-        final var params = new SphinxParams(); //TODO configure or get from coordinator
-        final var sphinxClient = new SphinxClient(params);
+        final var sphinxFactory = new DefaultSphinxFactory(); //TODO configure or get from coordinator
         final var mixNodeRepository = new CoordinatorMixNodeRepository(coordinatorConfig);
         mixNodeRepository.sync();
-        final var endpoint = new Endpoint(mixNodeRepository, NUMBER_OF_MIXES, sphinxClient);
-        final var sender = new Sender(endpoint, sphinxClient);
+        final var endpoint = new Endpoint(mixNodeRepository, NUMBER_OF_MIXES, sphinxFactory.client());
+        final var sender = new Sender(endpoint, sphinxFactory.client());
         final var client = new Client(sender);
 
         final var scanner = new Scanner(System.in);
