@@ -39,6 +39,7 @@ containers:jdk17:
   dependencies:
     - build:jdk17
   script:
+    - 'bash .ci/build-containers.sh'
 
 release:jdk17:
   stage: deploy
