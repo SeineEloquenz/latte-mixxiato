@@ -2,14 +2,14 @@ version: "3"
 
 services:
   coordinator:
-    image: registry.mixlab.mondcarion.group/mix-coordinator:latest
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-coordinator:latest
     networks:
     - mixnet
     volumes:
     - ./coordinator.json:/opt/app/coordinator.json
     command: "coordinator.json"
   mix0:
-    image: registry.mixlab.mondcarion.group/mix-node:latest
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
     ports:
     - "8888:8888"
     networks:
@@ -20,7 +20,7 @@ services:
     - coordinator
     command: "14689490706445660689531739089290021008940504028808418022674106323036"
   mix1:
-    image: registry.mixlab.mondcarion.group/mix-node:latest
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
     networks:
     - mixnet
     volumes:
@@ -29,7 +29,7 @@ services:
     - coordinator
     command: "20815161192604671013523738980898559822441853889016438091067546813119"
   mix2:
-    image: registry.mixlab.mondcarion.group/mix-node:latest
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
     networks:
     - mixnet
     volumes:
@@ -38,13 +38,13 @@ services:
     - coordinator
     command: "21490961561964975616985684726550966802671830914349170474172887400339"
   dead-drop:
-    image: registry.mixlab.mondcarion.group/mix-dead-drop:latest
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-dead-drop:latest
     networks:
     - mixnet
     volumes:
     - ./coord.json:/opt/app/coord.json
   client:
-    image: registry.mixlab.mondcarion.group/mix-client:latest
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
     networks:
     - mixnet
     volumes:
