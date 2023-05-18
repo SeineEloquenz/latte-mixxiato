@@ -12,8 +12,8 @@ public final class InMemoryMixNodeRepository implements MixNodeRepository {
         this.nodes = new HashMap<>();
     }
 
-    public void put(int id, MixNode node) {
-        nodes.put(id, node);
+    public void put(MixNode node) {
+        nodes.put(node.id(), node);
     }
 
     @Override
@@ -24,5 +24,15 @@ public final class InMemoryMixNodeRepository implements MixNodeRepository {
     @Override
     public Set<MixNode> all() {
         return new HashSet<>(nodes.values());
+    }
+
+    @Override
+    public int size() {
+        return nodes.size();
+    }
+
+    @Override
+    public void clear() {
+        nodes.clear();
     }
 }

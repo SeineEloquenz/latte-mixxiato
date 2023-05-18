@@ -5,10 +5,7 @@ services:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-coordinator:latest
     networks:
     - mixnet
-    volumes:
-    - ./coordinator.json:/opt/app/coordinator.json
-    command: "coordinator.json"
-  mix0:
+  mixa:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
     ports:
     - "8888:8888"
@@ -18,8 +15,8 @@ services:
     - ./coord.json:/opt/app/coord.json
     depends_on:
     - coordinator
-    command: "14689490706445660689531739089290021008940504028808418022674106323036"
-  mix1:
+    command: "mixa"
+  mixb:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
     networks:
     - mixnet
@@ -27,8 +24,8 @@ services:
     - ./coord.json:/opt/app/coord.json
     depends_on:
     - coordinator
-    command: "20815161192604671013523738980898559822441853889016438091067546813119"
-  mix2:
+    command: "mixb"
+  mixc:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
     networks:
     - mixnet
@@ -36,7 +33,7 @@ services:
     - ./coord.json:/opt/app/coord.json
     depends_on:
     - coordinator
-    command: "21490961561964975616985684726550966802671830914349170474172887400339"
+    command: "mixc"
   dead-drop:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-dead-drop:latest
     networks:
