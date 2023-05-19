@@ -49,9 +49,9 @@ services:
     command: "dead-drop 8888 hello this is obi wan"
     depends_on:
     - coordinator
-    - mix0
-    - mix1
-    - mix2
+    - mixa
+    - mixb
+    - mixc
 
 networks:
   mixnet:
