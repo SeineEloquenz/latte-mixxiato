@@ -36,6 +36,11 @@ public class Main {
 
         final var scanner = new Scanner(System.in);
         Logger.getGlobal().info("Sending messages from cli...");
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         messages.forEach(msg -> send(client, targetAddress, msg));
         Logger.getGlobal().info("Type your messages and confirm with enter. Entering :q will quit.");
         while (scanner.hasNext()) {

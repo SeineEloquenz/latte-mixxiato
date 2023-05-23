@@ -32,29 +32,12 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
         if (flag.equals(RoutingFlag.RELAY)) {
             final var relayInformation = router.findRelay(processedPacket);
-            CompletableFuture.supplyAsync(() -> relayInformation)
-                    .thenApplyAsync(this::delayPacket)
-                    .thenAcceptAsync(destination -> this.relay(destination, processedPacket));
+            this.relay(relayInformation.node(), processedPacket);
         } else if (flag.equals(RoutingFlag.DESTINATION)) {
             final var outwardMessage = router.findForwardDestination(processedPacket);
             Logger.getGlobal().info("Sending message outward to %s".formatted(outwardMessage.address()));
             outwardMessage.send();
         }
-    }
-
-    private MixNode delayPacket(RelayInformation relayInformation) {
-        try {
-            final var delay = relayInformation.delay();
-            Logger.getGlobal().info("Delaying packet for node %s for %s ms"
-                    .formatted(relayInformation.node().id(), delay));
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            Logger.getGlobal().warning("Interruption while waiting for delay for packet to node %s"
-                    .formatted(relayInformation.node().id()));
-            System.out.printf("Interruption while waiting for delay sending packet to node %s%n",
-                    relayInformation.node().id());
-        }
-        return relayInformation.node();
     }
 
     private void relay(MixNode destination, ProcessedPacket processedPacket) {

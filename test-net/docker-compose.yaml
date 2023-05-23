@@ -40,6 +40,8 @@ services:
     - mixnet
     volumes:
     - ./coord.json:/opt/app/coord.json
+    depends_on:
+    - coordinator
   client:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
     networks:

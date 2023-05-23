@@ -69,7 +69,7 @@ public class CoordinatorClient {
         while (mixes.size() != MixNodeRepository.DESIRED_MIX_AMOUNT) {
             mixes = this.getAllMixes();
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

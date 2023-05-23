@@ -26,8 +26,10 @@ public class Main {
         final var keyPair = sphinxFactory.pkiGenerator().generateKeyPair();
 
         coordinatorClient.register(host, port, keyPair.pub());
+        Logger.getGlobal().info("Registered with coordinator");
 
         final var mixRepository = coordinatorClient.waitForMixes();
+        Logger.getGlobal().info("Retrieved mix list from coordinator");
         final var router = new Router(mixRepository, sphinxFactory.client());
 
         //Actual server startup
