@@ -85,7 +85,7 @@ public class Endpoint {
                 .sorted(Comparator.comparingInt(MixNode::id))
                 .mapToInt(MixNode::id)
                 .toArray();
-        int[] usedNodes = client.randSubset(nodePool, numRouteNodes);
+        int[] usedNodes = client.route(nodePool, numRouteNodes);
 
         nodesRouting = new byte[usedNodes.length][];
         for (int i = 0; i < usedNodes.length; i++) {
