@@ -4,12 +4,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class InMemoryMixNodeRepository implements MixNodeRepository {
     private final Map<Integer, MixNode> nodes;
 
     public InMemoryMixNodeRepository() {
-        this.nodes = new HashMap<>();
+        this.nodes = new ConcurrentHashMap<>();
     }
 
     public void put(MixNode node) {

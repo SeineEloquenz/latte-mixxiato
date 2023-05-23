@@ -17,7 +17,7 @@ public class Coordinator {
     public Set<MixNode> all() {
         return mixNodeRepository.all();
     }
-    public MixNode register(String host, int port, ECPoint pubKey) throws MixSetFullException {
+    public synchronized MixNode register(String host, int port, ECPoint pubKey) throws MixSetFullException {
         if (mixNodeRepository.size() >= 3) {
             throw new MixSetFullException();
         }
