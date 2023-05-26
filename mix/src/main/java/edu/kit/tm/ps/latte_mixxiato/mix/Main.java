@@ -2,8 +2,12 @@ package edu.kit.tm.ps.latte_mixxiato.mix;
 
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
+import edu.kit.tm.ps.latte_mixxiato.lib.rounds.FixedRoundProvider;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Router;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
+import edu.kit.tm.ps.latte_mixxiato.mix.dispatcher.AsapDispatcher;
+import edu.kit.tm.ps.latte_mixxiato.mix.dispatcher.Dispatcher;
+import edu.kit.tm.ps.latte_mixxiato.mix.dispatcher.SynchronizingDispatcher;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -25,15 +29,23 @@ public class Main {
         final var sphinxFactory = new DefaultSphinxFactory(); //TODO set realistic parameters or get from coordinator
         final var keyPair = sphinxFactory.pkiGenerator().generateKeyPair();
 
-        coordinatorClient.register(host, port, keyPair.pub());
+        final var myId = coordinatorClient.register(host, port, keyPair.pub());
         Logger.getGlobal().info("Registered with coordinator");
 
         final var mixRepository = coordinatorClient.waitForMixes();
         Logger.getGlobal().info("Retrieved mix list from coordinator");
         final var router = new Router(mixRepository, sphinxFactory.client());
+        final var sphinxNode = sphinxFactory.node(keyPair.priv());
+
+        final Dispatcher dispatcher;
+        if (myId == 0) {
+            dispatcher = new SynchronizingDispatcher(sphinxNode, new FixedRoundProvider());
+        } else {
+            dispatcher = new AsapDispatcher(sphinxNode);
+        }
 
         //Actual server startup
-        final var server = new Server(port, sphinxFactory.client(), sphinxFactory.node(keyPair.priv()), router);
+        final var server = new Server(port, sphinxFactory.client(), sphinxFactory.node(keyPair.priv()), router, dispatcher);
         try {
             server.run();
         } catch (InterruptedException e) {

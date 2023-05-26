@@ -46,7 +46,7 @@ public class CoordinatorClient {
         }
     }
 
-    public void register(String host, int port, ECPoint pubKey) throws IOException {
+    public int register(String host, int port, ECPoint pubKey) throws IOException {
         final var json = new JsonObject();
         json.addProperty("host", host);
         json.addProperty("port", port);
@@ -58,6 +58,8 @@ public class CoordinatorClient {
             if (!response.isSuccessful()) {
                 throw new IOException("Registration was unsuccessful. Error code %s".formatted(response.code()));
             }
+            assert response.body() != null;
+            return JsonParser.parseString(response.body().string()).getAsJsonObject().get("id").getAsInt();
         }
 
     }

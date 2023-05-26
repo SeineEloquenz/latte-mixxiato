@@ -1,27 +1,27 @@
 package edu.kit.tm.ps.latte_mixxiato.mix;
 
 import com.robertsoultanaev.javasphinx.SphinxNode;
-import com.robertsoultanaev.javasphinx.packet.ProcessedPacket;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNode;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.RelayInformation;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Router;
+import edu.kit.tm.ps.latte_mixxiato.mix.dispatcher.Dispatcher;
+import edu.kit.tm.ps.latte_mixxiato.mix.dispatcher.SynchronizingDispatcher;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     private final SphinxNode node;
     private final Router router;
+    private final Dispatcher dispatcher;
 
-    public MessageHandler(final SphinxNode node, final Router router) {
+    public MessageHandler(final SphinxNode node, final Router router, final Dispatcher dispatcher) {
         this.node = node;
         this.router = router;
+        this.dispatcher = dispatcher;
     }
 
     @Override
@@ -32,21 +32,11 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
         if (flag.equals(RoutingFlag.RELAY)) {
             final var relayInformation = router.findRelay(processedPacket);
-            this.relay(relayInformation.node(), processedPacket);
+            dispatcher.dispatch(relayInformation, processedPacket);
         } else if (flag.equals(RoutingFlag.DESTINATION)) {
             final var outwardMessage = router.findForwardDestination(processedPacket);
             Logger.getGlobal().info("Sending message outward to %s".formatted(outwardMessage.address()));
             outwardMessage.send();
-        }
-    }
-
-    private void relay(MixNode destination, ProcessedPacket processedPacket) {
-        try {
-            destination.send(node.client(), node.repack(processedPacket));
-            Logger.getGlobal().info("Relayed packet to node %s".formatted(destination.id()));
-        } catch (IOException e) {
-            Logger.getGlobal().warning("Failed to relay packet to node %s".formatted(destination.id()));
-            throw new RuntimeException(e);
         }
     }
 

@@ -4,6 +4,7 @@ import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Sender;
+import edu.kit.tm.ps.latte_mixxiato.lib.rounds.FixedRoundProvider;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNodeRepository;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
@@ -31,7 +32,7 @@ public class Main {
         final var mixNodeRepository = coordinatorClient.waitForMixes();
 
         final var endpoint = new Endpoint(mixNodeRepository, MixNodeRepository.DESIRED_MIX_AMOUNT, sphinxFactory.client());
-        final var sender = new Sender(endpoint, sphinxFactory.client());
+        final var sender = new Sender(endpoint, sphinxFactory.client(), new FixedRoundProvider());
         final var client = new Client(sender);
 
         final var scanner = new Scanner(System.in);
@@ -41,26 +42,20 @@ public class Main {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        messages.forEach(msg -> send(client, targetAddress, msg));
+        messages.forEach(msg -> enqueue(client, targetAddress, msg));
         Logger.getGlobal().info("Type your messages and confirm with enter. Entering :q will quit.");
         while (scanner.hasNext()) {
             final var line = scanner.nextLine();
             if (":q".equals(line)) {
                 break;
             }
-            send(client, targetAddress, line);
+            enqueue(client, targetAddress, line);
         }
         Logger.getGlobal().info("Goodbye.");
     }
 
-    private static void send(Client client, InetSocketAddress destination, String message) {
-        try {
-            Logger.getGlobal().info("Sending message %s to %s%n".formatted(message, destination));
-            client.sendMessage(destination, message);
-        } catch (IOException e) {
-            Logger.getGlobal().severe("Error occured while message to %s:%s, dumping Stacktrace:"
-                    .formatted(destination.getHostName(), destination.getPort()));
-            e.printStackTrace();
-        }
+    private static void enqueue(Client client, InetSocketAddress destination, String message) {
+        Logger.getGlobal().info("Enqueueing message %s to %s%n".formatted(message, destination));
+        client.sendMessage(destination, message);
     }
 }
