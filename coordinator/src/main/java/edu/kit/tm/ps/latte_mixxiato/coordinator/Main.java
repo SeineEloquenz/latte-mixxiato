@@ -20,7 +20,7 @@ public class Main {
                     .forEach(result::add);
             return result;
         });
-        Spark.post("/api/register", (req, res) -> {
+        Spark.post("/api/mixes/register", (req, res) -> {
             if (req.body().isBlank()) {
                 res.status(Response.SC_BAD_REQUEST);
                 return "";

@@ -51,7 +51,7 @@ public class CoordinatorClient {
         json.addProperty("host", host);
         json.addProperty("port", port);
         json.addProperty("pubKey", SerializationUtils.base64encode(SerializationUtils.encodeECPoint(pubKey)));
-        final var request = buildRequest("/register")
+        final var request = buildRequest("/mixes/register")
                 .method("POST", RequestBody.create(json.toString(), MediaType.get("application/json")))
                 .build();
         try (final var response = client.newCall(request).execute()) {
