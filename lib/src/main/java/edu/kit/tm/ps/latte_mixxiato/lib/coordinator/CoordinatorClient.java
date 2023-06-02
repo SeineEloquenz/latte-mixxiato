@@ -50,7 +50,7 @@ public class CoordinatorClient {
     public MixNode register(MixType type, String host, int port, ECPoint pubKey) throws IOException {
         final var node = new MixNode(type, host, port, pubKey);
         final var json = node.toJson();
-        final var request = buildRequest("/mixes/register")
+        final var request = buildRequest("/%s/register".formatted(type.name().toLowerCase()))
                 .method("POST", RequestBody.create(json.toString(), MediaType.get("application/json")))
                 .build();
         try (final var response = client.newCall(request).execute()) {

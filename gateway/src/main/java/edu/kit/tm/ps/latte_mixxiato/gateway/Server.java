@@ -1,8 +1,7 @@
-package edu.kit.tm.ps.mixlab.gateway;
+package edu.kit.tm.ps.latte_mixxiato.gateway;
 
 import com.robertsoultanaev.javasphinx.SphinxClient;
 import com.robertsoultanaev.javasphinx.SphinxNode;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.Router;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -11,7 +10,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import okhttp3.Dispatcher;
 
 public class Server {
 

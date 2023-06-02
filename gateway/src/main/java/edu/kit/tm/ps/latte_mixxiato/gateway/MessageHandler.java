@@ -1,12 +1,10 @@
-package edu.kit.tm.ps.mixlab.gateway;
+package edu.kit.tm.ps.latte_mixxiato.gateway;
 
 import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.Router;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import okhttp3.Dispatcher;
 
 import java.io.IOException;
 import java.util.logging.Logger;

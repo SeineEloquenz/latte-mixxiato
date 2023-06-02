@@ -1,4 +1,4 @@
-package edu.kit.tm.ps.mixlab.gateway;
+package edu.kit.tm.ps.latte_mixxiato.gateway;
 
 import com.robertsoultanaev.javasphinx.SphinxClient;
 import io.netty.buffer.ByteBuf;

@@ -1,4 +1,4 @@
-package edu.kit.tm.ps.mixlab.gateway;
+package edu.kit.tm.ps.latte_mixxiato.gateway;
 
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
@@ -14,13 +14,11 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 2) {
-            Logger.getGlobal().severe("The server needs the following arguments:");
-            Logger.getGlobal().severe("1: port the server listens on");
-            Logger.getGlobal().severe("2: hostname the server is reachable under");
+            Logger.getGlobal().severe("You need to pass the hostname and port the server is listening on");
             System.exit(1);
         }
-        final var port = Integer.parseInt(args[0]);
-        final var host = args[1];
+        final var host = args[0];
+        final var port = Integer.parseInt(args[1]);
         final var coordinatorClient = new CoordinatorClient(CoordinatorConfig.load());
 
         final var sphinxFactory = new DefaultSphinxFactory(); //TODO set realistic parameters or get from coordinator

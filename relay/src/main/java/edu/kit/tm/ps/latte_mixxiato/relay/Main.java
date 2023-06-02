@@ -1,4 +1,4 @@
-package edu.kit.tm.ps.mixlab.relay;
+package edu.kit.tm.ps.latte_mixxiato.relay;
 
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;

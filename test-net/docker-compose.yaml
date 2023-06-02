@@ -6,7 +6,7 @@ services:
     networks:
     - mixnet
   gateway:
-    image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-gateway:latest
     ports:
     - "8888:8888"
     networks:
@@ -17,7 +17,7 @@ services:
     - coordinator
     command: "gateway 8888"
   relay:
-    image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-relay:latest
     networks:
     - mixnet
     volumes:

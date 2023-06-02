@@ -24,7 +24,7 @@ public class Main {
         });
         Spark.post("/api/gateway/register", (req, res) -> register(req, res, coordinator));
         Spark.post("/api/relay/register", (req, res) -> register(req, res, coordinator));
-        Spark.post("/api/dead-drop/register", (req, res) -> register(req, res, coordinator));
+        Spark.post("/api/dead_drop/register", (req, res) -> register(req, res, coordinator));
         Logger.getGlobal().info("Listening for requests...");
     }
 

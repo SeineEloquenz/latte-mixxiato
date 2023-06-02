@@ -23,7 +23,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>edu.kit.tm.ps.latte_mixxiato.mix.Main</mainClass>
+                            <mainClass>edu.kit.tm.ps.latte_mixxiato.relay.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
