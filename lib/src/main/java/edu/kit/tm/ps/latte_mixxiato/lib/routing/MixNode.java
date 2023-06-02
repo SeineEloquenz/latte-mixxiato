@@ -9,14 +9,14 @@ import org.bouncycastle.math.ec.ECPoint;
 import java.io.IOException;
 import java.net.Socket;
 
-public record MixNode(int id, String host, int port, ECPoint publicKey) {
+public record MixNode(MixType type, String host, int port, ECPoint publicKey) {
 
     public static MixNode fromJson(JsonObject json) {
-        final var id = json.get("id").getAsInt();
+        final var type = json.get("type").getAsInt();
         final var host = json.get("host").getAsString();
         final var port = json.get("port").getAsInt();
         final var pubKey = SerializationUtils.decodeECPoint(SerializationUtils.base64decode(json.get("pubKey").getAsString()));
-        return new MixNode(id, host, port, pubKey);
+        return new MixNode(MixType.values()[type], host, port, pubKey);
     }
 
     /**
@@ -34,7 +34,7 @@ public record MixNode(int id, String host, int port, ECPoint publicKey) {
 
     public JsonObject toJson() {
         final var json = new JsonObject();
-        json.addProperty("id", id);
+        json.addProperty("type", type.ordinal());
         json.addProperty("host", host);
         json.addProperty("port", port);
         json.addProperty("pubKey", SerializationUtils.base64encode(SerializationUtils.encodeECPoint(publicKey)));

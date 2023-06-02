@@ -19,9 +19,9 @@
     <modules>
         <module>lib</module>
         <module>client</module>
-        <module>mix</module>
         <module>dead-drop</module>
         <module>coordinator</module>
+        <module>gateway</module>
     </modules>
 
     <build>

@@ -5,7 +5,7 @@ import java.util.Set;
 public interface MixNodeRepository {
 
     public static final int DESIRED_MIX_AMOUNT = 3;
-    MixNode byId(int nodeId);
+    MixNode byType(MixType type);
 
     Set<MixNode> all();
 

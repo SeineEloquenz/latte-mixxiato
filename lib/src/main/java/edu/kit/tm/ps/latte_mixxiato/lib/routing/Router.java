@@ -18,19 +18,6 @@ public class Router {
         this.client = client;
     }
 
-    public RelayInformation findRelay(ProcessedPacket packet) throws IOException {
-        final var unpacker = MessagePack.newDefaultUnpacker(packet.routing());
-        final var routingLength = unpacker.unpackArrayHeader();
-        final var flag = unpacker.unpackString();
-        if (!RoutingFlag.RELAY.value().equals(flag)) {
-            throw new SphinxException("Packet should not be relayed!");
-        }
-        final var delay = unpacker.unpackInt();
-        final var nextNodeId = unpacker.unpackInt();
-        unpacker.close();
-        return new RelayInformation(repository.byId(nextNodeId), delay);
-    }
-
     public OutwardMessage findForwardDestination(ProcessedPacket packet) throws IOException {
         final var unpacker = MessagePack.newDefaultUnpacker(packet.routing());
         final var routingLength = unpacker.unpackArrayHeader();

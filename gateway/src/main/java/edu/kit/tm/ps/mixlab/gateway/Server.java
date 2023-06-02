@@ -1,11 +1,8 @@
-package edu.kit.tm.ps.latte_mixxiato.mix;
+package edu.kit.tm.ps.mixlab.gateway;
 
 import com.robertsoultanaev.javasphinx.SphinxClient;
 import com.robertsoultanaev.javasphinx.SphinxNode;
-import edu.kit.tm.ps.latte_mixxiato.lib.rounds.FixedRoundProvider;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Router;
-import edu.kit.tm.ps.latte_mixxiato.mix.dispatcher.Dispatcher;
-import edu.kit.tm.ps.latte_mixxiato.mix.dispatcher.SynchronizingDispatcher;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -14,20 +11,19 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import okhttp3.Dispatcher;
 
 public class Server {
 
     private final int port;
     private final SphinxClient client;
     private final SphinxNode node;
-    private final Router router;
-    private final Dispatcher dispatcher;
+    private final SynchronizingDispatcher dispatcher;
 
-    public Server(final int port, final SphinxClient client, final SphinxNode node, final Router router, final Dispatcher dispatcher) {
+    public Server(final int port, final SphinxClient client, final SphinxNode node, final SynchronizingDispatcher dispatcher) {
         this.port = port;
         this.client = client;
         this.node = node;
-        this.router = router;
         this.dispatcher = dispatcher;
     }
 
@@ -43,7 +39,7 @@ public class Server {
                         public void initChannel(SocketChannel ch) {
                             ch.pipeline().addLast(
                                     new SphinxPacketDecoder(client),
-                                    new MessageHandler(node, router, dispatcher)
+                                    new MessageHandler(node, dispatcher)
                             );
                         }
                     })

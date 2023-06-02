@@ -7,19 +7,19 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class InMemoryMixNodeRepository implements MixNodeRepository {
-    private final Map<Integer, MixNode> nodes;
+    private final Map<MixType, MixNode> nodes;
 
     public InMemoryMixNodeRepository() {
         this.nodes = new ConcurrentHashMap<>();
     }
 
     public void put(MixNode node) {
-        nodes.put(node.id(), node);
+        nodes.put(node.type(), node);
     }
 
     @Override
-    public MixNode byId(int nodeId) {
-        return nodes.get(nodeId);
+    public MixNode byType(MixType type) {
+        return nodes.get(type);
     }
 
     @Override

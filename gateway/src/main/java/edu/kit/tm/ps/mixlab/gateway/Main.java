@@ -1,16 +1,13 @@
-package edu.kit.tm.ps.latte_mixxiato.mix;
+package edu.kit.tm.ps.mixlab.gateway;
 
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.FixedRoundProvider;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixType;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Router;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
-import edu.kit.tm.ps.latte_mixxiato.mix.dispatcher.AsapDispatcher;
-import edu.kit.tm.ps.latte_mixxiato.mix.dispatcher.Dispatcher;
-import edu.kit.tm.ps.latte_mixxiato.mix.dispatcher.SynchronizingDispatcher;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.logging.Logger;
 
 public class Main {
@@ -29,7 +26,7 @@ public class Main {
         final var sphinxFactory = new DefaultSphinxFactory(); //TODO set realistic parameters or get from coordinator
         final var keyPair = sphinxFactory.pkiGenerator().generateKeyPair();
 
-        final var myId = coordinatorClient.register(host, port, keyPair.pub());
+        final var myNode = coordinatorClient.register(MixType.GATEWAY, host, port, keyPair.pub());
         Logger.getGlobal().info("Registered with coordinator");
 
         final var mixRepository = coordinatorClient.waitForMixes();
@@ -37,15 +34,10 @@ public class Main {
         final var router = new Router(mixRepository, sphinxFactory.client());
         final var sphinxNode = sphinxFactory.node(keyPair.priv());
 
-        final Dispatcher dispatcher;
-        if (myId == 0) {
-            dispatcher = new SynchronizingDispatcher(sphinxNode, new FixedRoundProvider());
-        } else {
-            dispatcher = new AsapDispatcher(sphinxNode);
-        }
+        final SynchronizingDispatcher dispatcher = new SynchronizingDispatcher(sphinxNode, mixRepository.byType(MixType.RELAY), new FixedRoundProvider());
 
         //Actual server startup
-        final var server = new Server(port, sphinxFactory.client(), sphinxFactory.node(keyPair.priv()), router, dispatcher);
+        final var server = new Server(port, sphinxFactory.client(), sphinxFactory.node(keyPair.priv()), dispatcher);
         try {
             server.run();
         } catch (InterruptedException e) {

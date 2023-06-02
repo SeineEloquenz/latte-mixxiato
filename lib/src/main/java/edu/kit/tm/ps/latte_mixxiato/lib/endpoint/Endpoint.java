@@ -7,6 +7,7 @@ import com.robertsoultanaev.javasphinx.packet.header.PacketContent;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.DestinationEncoding;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNode;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNodeRepository;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixType;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.OutwardMessage;
 import org.bouncycastle.math.ec.ECPoint;
 
@@ -55,7 +56,7 @@ public class Endpoint {
 
             RoutingInformation routingInformation = generateRoutingInformation(this.numRouteNodes, generateDelays(numRouteNodes));
 
-            final var targetMix = mixNodeRepository.byId(routingInformation.firstNodeId());
+            final var targetMix = mixNodeRepository.byType(MixType.GATEWAY);
             sphinxPackets.put(createSphinxPacket(dest, sphinxPayload, routingInformation), targetMix);
         }
 
@@ -82,8 +83,8 @@ public class Endpoint {
         final ECPoint[] nodeKeys;
 
         final var nodePool = mixNodeRepository.all().stream()
-                .sorted(Comparator.comparingInt(MixNode::id))
-                .mapToInt(MixNode::id)
+                .sorted(Comparator.comparingInt(node -> node.type().ordinal()))
+                .mapToInt(node -> node.type().ordinal())
                 .toArray();
         int[] usedNodes = client.route(nodePool, numRouteNodes);
 
@@ -94,7 +95,7 @@ public class Endpoint {
 
         nodeKeys = new ECPoint[usedNodes.length];
         for (int i = 0; i < usedNodes.length; i++) {
-            nodeKeys[i] = mixNodeRepository.byId(usedNodes[i]).publicKey();
+            nodeKeys[i] = mixNodeRepository.byType(MixType.values()[usedNodes[i]]).publicKey();
         }
 
         return new RoutingInformation(nodesRouting, nodeKeys, usedNodes[0]);

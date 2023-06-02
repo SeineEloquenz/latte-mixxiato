@@ -7,6 +7,7 @@ import com.robertsoultanaev.javasphinx.SerializationUtils;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.InMemoryMixNodeRepository;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNode;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNodeRepository;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixType;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -46,11 +47,9 @@ public class CoordinatorClient {
         }
     }
 
-    public int register(String host, int port, ECPoint pubKey) throws IOException {
-        final var json = new JsonObject();
-        json.addProperty("host", host);
-        json.addProperty("port", port);
-        json.addProperty("pubKey", SerializationUtils.base64encode(SerializationUtils.encodeECPoint(pubKey)));
+    public MixNode register(MixType type, String host, int port, ECPoint pubKey) throws IOException {
+        final var node = new MixNode(type, host, port, pubKey);
+        final var json = node.toJson();
         final var request = buildRequest("/mixes/register")
                 .method("POST", RequestBody.create(json.toString(), MediaType.get("application/json")))
                 .build();
@@ -59,7 +58,7 @@ public class CoordinatorClient {
                 throw new IOException("Registration was unsuccessful. Error code %s".formatted(response.code()));
             }
             assert response.body() != null;
-            return JsonParser.parseString(response.body().string()).getAsJsonObject().get("id").getAsInt();
+            return node;
         }
 
     }

@@ -4,7 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>latte-mixxiato.mix</artifactId>
+    <groupId>edu.kit.tm.ps.mixlab</groupId>
+    <artifactId>latte-mixxiato.gateway</artifactId>
 
     <parent>
         <groupId>edu.kit.tm.ps</groupId>
@@ -43,4 +44,5 @@
             <version>${revision}</version>
         </dependency>
     </dependencies>
+
 </project>
