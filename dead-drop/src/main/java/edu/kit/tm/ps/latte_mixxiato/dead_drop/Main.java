@@ -28,6 +28,7 @@ public class Main {
         final var sphinxNode = sphinxFactory.node(keyPair.priv());
 
         coordinatorClient.register(MixType.DEAD_DROP, hostname, port, keyPair.pub());
+        Logger.getGlobal().info("Registered with coordinator");
 
         final var mixNodeRepository = coordinatorClient.waitForMixes();
 
