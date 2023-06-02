@@ -1,11 +1,8 @@
 package edu.kit.tm.ps.latte_mixxiato.dead_drop;
 
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
-import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
-import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.DestinationEncoding;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixType;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
