@@ -40,7 +40,7 @@ services:
     - mixnet
     volumes:
     - ./coord.json:/opt/app/coord.json
-    command: "8000 i have the high ground!"
+    command: "0 i have the high ground!"
     depends_on:
     - coordinator
     - gateway
@@ -52,7 +52,7 @@ services:
       - mixnet
     volumes:
       - ./coord.json:/opt/app/coord.json
-    command: "8000"
+    command: "0"
     depends_on:
       - coordinator
       - gateway

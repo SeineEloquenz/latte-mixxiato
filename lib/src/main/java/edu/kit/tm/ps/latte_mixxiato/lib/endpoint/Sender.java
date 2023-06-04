@@ -22,12 +22,12 @@ import java.util.logging.Logger;
 public class Sender {
 
     private final Gateway gateway;
-    private final Endpoint endpoint;
+    private final MessageBuilder messageBuilder;
     private final Queue<SphinxPacket> packetQueue;
 
-    public Sender(final Gateway gateway, final Endpoint endpoint, final SphinxClient client, final RoundProvider provider) {
+    public Sender(final Gateway gateway, final MessageBuilder messageBuilder, final SphinxClient client, final RoundProvider provider) {
         this.gateway = gateway;
-        this.endpoint = endpoint;
+        this.messageBuilder = messageBuilder;
         this.packetQueue = new LinkedList<>();
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         service.scheduleAtFixedRate(
@@ -53,14 +53,14 @@ public class Sender {
     }
 
     public void enqueueToSend(InwardMessage message) throws SphinxException {
-        final var packets = endpoint.splitIntoSphinxPackets(message);
+        final var packets = messageBuilder.splitIntoSphinxPackets(message);
         packetQueue.addAll(packets);
     }
 
     private Optional<SphinxPacket> generateNoisePacket() {
         final List<SphinxPacket> packets;
         try {
-            packets = endpoint.splitIntoSphinxPackets(new InwardMessage("<empty>".getBytes(StandardCharsets.UTF_8)));
+            packets = messageBuilder.splitIntoSphinxPackets(new InwardMessage("<empty>".getBytes(StandardCharsets.UTF_8)));
             return Optional.ofNullable(packets.get(0));
         } catch (SphinxException e) {
             Logger.getGlobal().warning("Failed to generate noise packet, Stacktrace:");

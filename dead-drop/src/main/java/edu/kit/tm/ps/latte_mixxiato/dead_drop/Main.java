@@ -4,6 +4,7 @@ import com.robertsoultanaev.javasphinx.SphinxException;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.ReplyBuilder;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
@@ -37,7 +38,7 @@ public class Main {
         final var relay = coordinatorClient.relay();
 
         final var deadDropServer = new DeadDropServer(port, relay.host(), relay.deadDropPort(),
-                new Endpoint(gateway, relay, deadDrop, sphinxFactory.client()), sphinxNode);
+                new ReplyBuilder(gateway, relay, deadDrop, sphinxFactory.client()), sphinxNode);
 
         deadDropServer.listen();
     }

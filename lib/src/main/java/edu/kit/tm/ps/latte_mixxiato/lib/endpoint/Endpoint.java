@@ -15,15 +15,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class Endpoint {
+public abstract class Endpoint {
 
     private record RoutingInformation(byte[][] nodesRouting, ECPoint[] nodeKeys, int firstNodeId) {
     }
-
     private final Gateway gateway;
     private final Relay relay;
     private final DeadDrop deadDrop;
-    private final SphinxClient client;
+    protected final SphinxClient client;
 
     public Endpoint(Gateway gateway, final Relay relay, final DeadDrop deadDrop, SphinxClient client) {
         this.gateway = gateway;
@@ -32,36 +31,12 @@ public class Endpoint {
         this.client = client;
     }
 
-    public List<SphinxPacket> splitIntoSphinxPackets(InwardMessage message) throws SphinxException {
-        final var messageId = UUID.randomUUID();
-        byte[] dest = SerializationUtils.encodeLong(UUID.randomUUID().getMostSignificantBits());
-
-        final var packetPayloadSize = client.getMaxPayloadSize() - dest.length - Packet.HEADER_SIZE;
-        final var packetsInMessage = (int) Math.ceil((double) message.message().length / packetPayloadSize);
-        final var sphinxPackets = new LinkedList<SphinxPacket>();
-
-        for (int i = 0; i < packetsInMessage; i++) {
-            final var bucketId = UUID.randomUUID();
-            byte[] packetPayload = copyUpToNum(message.message(), packetPayloadSize * i, packetPayloadSize);
-            final var packet = new Packet(messageId, bucketId, packetsInMessage, i, packetPayload);
-
-            sphinxPackets.add(createSphinxPacket(dest, packet.toBytes(), inboundRoutingInformation()));
-        }
-
-        return sphinxPackets;
-    }
-
-    public SphinxPacket repackReply(Packet packet) throws SphinxException {
-        byte[] dest = SerializationUtils.encodeLong(UUID.randomUUID().getMostSignificantBits());
-        return createSphinxPacket(dest, packet.toBytes(), outboundRoutingInformation());
-    }
-
-    private SphinxPacket createSphinxPacket(byte[] dest, byte[] message, RoutingInformation routingInformation) throws SphinxException {
+    protected SphinxPacket createSphinxPacket(byte[] dest, byte[] message, Endpoint.RoutingInformation routingInformation) throws SphinxException {
         PacketContent packetContent = client.createForwardMessage(routingInformation.nodesRouting, routingInformation.nodeKeys, dest, message);
         return client.createPacket(packetContent);
     }
 
-    private RoutingInformation inboundRoutingInformation() throws SphinxException {
+    protected RoutingInformation inboundRoutingInformation() throws SphinxException {
         final byte[][] nodesRouting = new byte[3][];
         final ECPoint[] nodeKeys = new ECPoint[3];
 
@@ -74,7 +49,7 @@ public class Endpoint {
         return new RoutingInformation(nodesRouting, nodeKeys, 0);
     }
 
-    private RoutingInformation outboundRoutingInformation() throws SphinxException {
+    protected RoutingInformation outboundRoutingInformation() throws SphinxException {
         final byte[][] nodesRouting = new byte[2][];
         final ECPoint[] nodeKeys = new ECPoint[2];
 
@@ -85,7 +60,7 @@ public class Endpoint {
         return new RoutingInformation(nodesRouting, nodeKeys, 1);
     }
 
-    private byte[] copyUpToNum(byte[] source, int offset, int numBytes) {
+    protected byte[] copyUpToNum(byte[] source, int offset, int numBytes) {
         if (offset + numBytes > source.length) {
             numBytes = source.length - offset;
         }

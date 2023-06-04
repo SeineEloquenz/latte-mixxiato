@@ -6,6 +6,7 @@ import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.message.DestinationAndMessage;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Packet;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.ReplyBuilder;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -19,15 +20,15 @@ public class DeadDropServer {
     private final int myPort;
     private final String targetHost;
     private final int targetPort;
-    private final Endpoint endpoint;
+    private final ReplyBuilder replyBuilder;
     private final SphinxNode node;
     private final Store store;
 
-    public DeadDropServer(final int myPort, final String targetHost, final int targetPort, final Endpoint endpoint, final SphinxNode node) {
+    public DeadDropServer(final int myPort, final String targetHost, final int targetPort, final ReplyBuilder replyBuilder, final SphinxNode node) {
         this.myPort = myPort;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
-        this.endpoint = endpoint;
+        this.replyBuilder = replyBuilder;
         this.node = node;
         this.store = new Store();
     }
@@ -45,7 +46,7 @@ public class DeadDropServer {
                 try (final var outgoingSocket = new Socket(targetHost, targetPort)) {
                     try (final var os = outgoingSocket.getOutputStream()) {
                         while (!store.isEmpty()) {
-                            final var replyPacket = endpoint.repackReply(store.popReply());
+                            final var replyPacket = replyBuilder.repackReply(store.popReply());
                             final var replyBytes = node.client().packMessage(replyPacket);
                             os.write(replyBytes);
                         }
