@@ -1,6 +1,7 @@
 package edu.kit.tm.ps.latte_mixxiato.lib.endpoint;
 
 import com.robertsoultanaev.javasphinx.SphinxClient;
+import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.RoundProvider;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
@@ -37,6 +38,8 @@ public class Sender {
                         } catch (IOException e) {
                             Logger.getGlobal().warning("Failed to send packet Trying again in next round. Stacktrace: ");
                             e.printStackTrace();
+                        } catch (SphinxException e) {
+                            e.printStackTrace();
                         }
                     });
                 },
@@ -45,12 +48,12 @@ public class Sender {
                 TimeUnit.MILLISECONDS);
     }
 
-    public void enqueueToSend(InwardMessage message) {
+    public void enqueueToSend(InwardMessage message) throws SphinxException {
         final var packets = endpoint.splitIntoSphinxPackets(message);
         packetQueue.addAll(packets);
     }
 
-    private void send(SphinxClient client, SphinxPacket packet) throws IOException {
+    private void send(SphinxClient client, SphinxPacket packet) throws IOException, SphinxException {
         try (final var socket = new Socket(gateway.host(), gateway.clientPort())) {
             final var os = socket.getOutputStream();
             os.write(client.packMessage(packet));

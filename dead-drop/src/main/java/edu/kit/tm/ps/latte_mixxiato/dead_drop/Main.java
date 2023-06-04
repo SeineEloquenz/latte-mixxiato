@@ -1,18 +1,18 @@
 package edu.kit.tm.ps.latte_mixxiato.dead_drop;
 
-import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
+import com.robertsoultanaev.javasphinx.SphinxException;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.logging.Logger;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SphinxException {
         if (args.length != 2) {
             Logger.getGlobal().severe("You need to pass the hostname and gatewayPort the server is listening on");
             System.exit(1);
@@ -33,9 +33,11 @@ public class Main {
 
         coordinatorClient.waitUntilReady();
 
+        final var gateway = coordinatorClient.gateway();
         final var relay = coordinatorClient.relay();
 
-        final var deadDropServer = new DeadDropServer(port, relay.host(), relay.deadDropPort(), sphinxNode);
+        final var deadDropServer = new DeadDropServer(port, relay.host(), relay.deadDropPort(),
+                new Endpoint(gateway, relay, deadDrop, sphinxFactory.client()), sphinxNode);
 
         deadDropServer.listen();
     }

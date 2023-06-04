@@ -1,5 +1,6 @@
 package edu.kit.tm.ps.latte_mixxiato.relay;
 
+import com.robertsoultanaev.javasphinx.SphinxException;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
@@ -39,14 +40,14 @@ public class Main {
         executor.submit(() -> {
             try {
                 gatewayRelay.listen();
-            } catch (IOException e) {
+            } catch (IOException | SphinxException e) {
                 e.printStackTrace();
             }
         });
         executor.submit(() -> {
             try {
                 deadDropRelay.listen();
-            } catch (IOException e) {
+            } catch (IOException | SphinxException e) {
                 e.printStackTrace();
             }
         });

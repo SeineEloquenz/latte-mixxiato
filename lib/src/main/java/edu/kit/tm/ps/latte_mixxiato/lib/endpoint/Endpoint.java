@@ -2,6 +2,7 @@ package edu.kit.tm.ps.latte_mixxiato.lib.endpoint;
 
 import com.robertsoultanaev.javasphinx.SerializationUtils;
 import com.robertsoultanaev.javasphinx.SphinxClient;
+import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import com.robertsoultanaev.javasphinx.packet.header.PacketContent;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
@@ -10,7 +11,6 @@ import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.InwardMessage;
 import org.bouncycastle.math.ec.ECPoint;
 
-import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +32,7 @@ public class Endpoint {
         this.client = client;
     }
 
-    public List<SphinxPacket> splitIntoSphinxPackets(InwardMessage message) {
+    public List<SphinxPacket> splitIntoSphinxPackets(InwardMessage message) throws SphinxException {
         final var messageId = UUID.randomUUID();
         byte[] dest = SerializationUtils.encodeLong(UUID.randomUUID().getMostSignificantBits());
 
@@ -42,30 +42,26 @@ public class Endpoint {
 
         for (int i = 0; i < packetsInMessage; i++) {
             final var bucketId = UUID.randomUUID();
-
-            final var packetHeader = ByteBuffer.allocate(Packet.HEADER_SIZE);
-            packetHeader.putLong(messageId.getMostSignificantBits());
-            packetHeader.putLong(messageId.getLeastSignificantBits());
-            packetHeader.putLong(bucketId.getMostSignificantBits());
-            packetHeader.putLong(bucketId.getLeastSignificantBits());
-            packetHeader.putInt(packetsInMessage);
-            packetHeader.putInt(i);
-
             byte[] packetPayload = copyUpToNum(message.message(), packetPayloadSize * i, packetPayloadSize);
-            byte[] sphinxPayload = SerializationUtils.concatenate(packetHeader.array(), packetPayload);
+            final var packet = new Packet(messageId, bucketId, packetsInMessage, i, packetPayload);
 
-            sphinxPackets.add(createSphinxPacket(dest, sphinxPayload, generateRoutingInformation()));
+            sphinxPackets.add(createSphinxPacket(dest, packet.toBytes(), inboundRoutingInformation()));
         }
 
         return sphinxPackets;
     }
 
-    private SphinxPacket createSphinxPacket(byte[] dest, byte[] message, RoutingInformation routingInformation) {
+    public SphinxPacket repackReply(Packet packet) throws SphinxException {
+        byte[] dest = SerializationUtils.encodeLong(UUID.randomUUID().getMostSignificantBits());
+        return createSphinxPacket(dest, packet.toBytes(), outboundRoutingInformation());
+    }
+
+    private SphinxPacket createSphinxPacket(byte[] dest, byte[] message, RoutingInformation routingInformation) throws SphinxException {
         PacketContent packetContent = client.createForwardMessage(routingInformation.nodesRouting, routingInformation.nodeKeys, dest, message);
         return client.createPacket(packetContent);
     }
 
-    private RoutingInformation generateRoutingInformation() {
+    private RoutingInformation inboundRoutingInformation() throws SphinxException {
         final byte[][] nodesRouting = new byte[3][];
         final ECPoint[] nodeKeys = new ECPoint[3];
 
@@ -76,6 +72,17 @@ public class Endpoint {
         nodesRouting[2] = client.encodeNode(2, 0);
         nodeKeys[2] = deadDrop.publicKey();
         return new RoutingInformation(nodesRouting, nodeKeys, 0);
+    }
+
+    private RoutingInformation outboundRoutingInformation() throws SphinxException {
+        final byte[][] nodesRouting = new byte[2][];
+        final ECPoint[] nodeKeys = new ECPoint[2];
+
+        nodesRouting[1] = client.encodeNode(0, 0);
+        nodeKeys[1] = gateway.publicKey();
+        nodesRouting[0] = client.encodeNode(1, 0);
+        nodeKeys[0] = relay.publicKey();
+        return new RoutingInformation(nodesRouting, nodeKeys, 1);
     }
 
     private byte[] copyUpToNum(byte[] source, int offset, int numBytes) {

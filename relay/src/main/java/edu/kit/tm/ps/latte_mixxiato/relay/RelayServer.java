@@ -1,5 +1,6 @@
 package edu.kit.tm.ps.latte_mixxiato.relay;
 
+import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
@@ -25,7 +26,7 @@ public class RelayServer {
         this.node = node;
     }
 
-    public void listen() throws IOException {
+    public void listen() throws IOException, SphinxException {
         try (final var serverSocket = new ServerSocket(myPort)) {
             Logger.getGlobal().info("Opened socket on port %s".formatted(myPort));
             while (true) {
@@ -38,12 +39,14 @@ public class RelayServer {
         }
     }
 
-    private List<SphinxPacket> handleConnection(Socket socket) throws IOException {
+    private List<SphinxPacket> handleConnection(Socket socket) throws IOException, SphinxException {
         final var packetList = new LinkedList<SphinxPacket>();
         try (final var is = socket.getInputStream()) {
             do {
                 final var packetBytes = is.readNBytes(1254);
+                Logger.getGlobal().info("Got packet, processing.");
                 final var processedPacket = node.sphinxProcess(node.client().unpackMessage(packetBytes).packetContent());
+                Logger.getGlobal().info("Packet processed successfully.");
                 final var flag = processedPacket.routingFlag();
                 if (flag.equals(RoutingFlag.RELAY)) {
                     packetList.add(node.repack(processedPacket));
@@ -56,7 +59,7 @@ public class RelayServer {
         return packetList;
     }
 
-    public void send(List<SphinxPacket> packets) throws IOException {
+    public void send(List<SphinxPacket> packets) throws IOException, SphinxException {
         Logger.getGlobal().info("Opening outgoing Socket to %s:%s".formatted(targetHost, targetPort));
         try (final var outgoingSocket = new Socket(targetHost, targetPort)) {
             try (final var os = outgoingSocket.getOutputStream()) {

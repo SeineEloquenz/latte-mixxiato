@@ -1,54 +1,40 @@
 package edu.kit.tm.ps.latte_mixxiato.gateway;
 
-import com.robertsoultanaev.javasphinx.SphinxClient;
-import com.robertsoultanaev.javasphinx.SphinxNode;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+import com.robertsoultanaev.javasphinx.SphinxException;
+import edu.kit.tm.ps.latte_mixxiato.gateway.client.ClientGateway;
+import edu.kit.tm.ps.latte_mixxiato.gateway.relay.RelayGateway;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int port;
-    private final SphinxClient client;
-    private final SphinxNode node;
-    private final SynchronizingDispatcher dispatcher;
+    private final ClientGateway clientGateway;
+    private final RelayGateway relayGateway;
+    private final ExecutorService service;
 
-    public Server(final int port, final SphinxClient client, final SphinxNode node, final SynchronizingDispatcher dispatcher) {
-        this.port = port;
-        this.client = client;
-        this.node = node;
-        this.dispatcher = dispatcher;
+    public Server(final ClientGateway clientGateway, final RelayGateway relayGateway) {
+        this.clientGateway = clientGateway;
+        this.relayGateway = relayGateway;
+        this.service = Executors.newFixedThreadPool(2);
     }
 
-    public void run() throws InterruptedException {
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
-            ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(
-                                    new SphinxPacketDecoder(client),
-                                    new MessageHandler(node, dispatcher)
-                            );
-                        }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
-
-            ChannelFuture f = bootstrap.bind(port).sync();
-            f.channel().closeFuture().sync();
-        } finally {
-            workerGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
-        }
+    public void run() {
+        service.submit(() -> {
+            try {
+                clientGateway.listen();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        service.submit(() -> {
+            try {
+                relayGateway.listen();
+            } catch (IOException | SphinxException e) {
+                e.printStackTrace();
+            }
+        });
     }
+
 }

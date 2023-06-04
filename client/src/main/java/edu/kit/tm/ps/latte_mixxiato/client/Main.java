@@ -1,5 +1,6 @@
 package edu.kit.tm.ps.latte_mixxiato.client;
 
+import com.robertsoultanaev.javasphinx.SphinxException;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
@@ -52,6 +53,10 @@ public class Main {
 
     private static void enqueue(Client client, String message) {
         Logger.getGlobal().info("Enqueueing message %s".formatted(message));
-        client.sendMessage(message);
+        try {
+            client.sendMessage(message);
+        } catch (SphinxException e) {
+            e.printStackTrace();
+        }
     }
 }

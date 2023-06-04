@@ -1,6 +1,7 @@
-package edu.kit.tm.ps.latte_mixxiato.gateway;
+package edu.kit.tm.ps.latte_mixxiato.gateway.client;
 
 import com.robertsoultanaev.javasphinx.SphinxClient;
+import com.robertsoultanaev.javasphinx.SphinxException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -18,7 +19,7 @@ public class SphinxPacketDecoder extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(final ChannelHandlerContext context, final ByteBuf buffer, final List<Object> list) {
+    protected void decode(final ChannelHandlerContext context, final ByteBuf buffer, final List<Object> list) throws SphinxException {
         if (buffer.readableBytes() < client.params().packetLength()) {
             Logger.getGlobal().warning("Got %s readable bytes but expected %s"
                     .formatted(buffer.readableBytes(), client.params().packetLength()));

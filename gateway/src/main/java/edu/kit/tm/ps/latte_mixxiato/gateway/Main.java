@@ -1,5 +1,9 @@
 package edu.kit.tm.ps.latte_mixxiato.gateway;
 
+import edu.kit.tm.ps.latte_mixxiato.gateway.client.ClientGateway;
+import edu.kit.tm.ps.latte_mixxiato.gateway.client.SynchronizingDispatcher;
+import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientList;
+import edu.kit.tm.ps.latte_mixxiato.gateway.relay.RelayGateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.FixedRoundProvider;
@@ -14,7 +18,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 3) {
-            Logger.getGlobal().severe("You need to pass the hostname, client and relay relayPort the server is listening on");
+            Logger.getGlobal().severe("You need to pass the hostname, client and relay port the server is listening on");
             System.exit(1);
         }
         final var host = args[0];
@@ -31,15 +35,16 @@ public class Main {
         coordinatorClient.waitUntilReady();
         final var sphinxNode = sphinxFactory.node(keyPair.priv());
 
-        final SynchronizingDispatcher dispatcher = new SynchronizingDispatcher(sphinxNode, coordinatorClient.relay(), new FixedRoundProvider(1, ChronoUnit.MINUTES));
+        final var clientList = new ClientList();
+
+        final SynchronizingDispatcher dispatcher = new SynchronizingDispatcher(sphinxNode,
+                coordinatorClient.relay(), new FixedRoundProvider(1, ChronoUnit.MINUTES), clientList);
+
+        final var clientGateway = new ClientGateway(clientPort, sphinxNode, dispatcher);
+        final var relayGateway = new RelayGateway(relayPort, clientList, sphinxNode);
 
         //Actual server startup
-        final var server = new Server(clientPort, sphinxFactory.client(), sphinxFactory.node(keyPair.priv()), dispatcher);
-        try {
-            server.run();
-        } catch (InterruptedException e) {
-            Logger.getGlobal().info("Server interrupted. Stopping.");
-            System.exit(1);
-        }
+        final var server = new Server(clientGateway, relayGateway);
+        server.run();
     }
 }

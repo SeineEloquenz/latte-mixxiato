@@ -1,9 +1,10 @@
 package edu.kit.tm.ps.latte_mixxiato.dead_drop;
 
-import com.robertsoultanaev.javasphinx.SerializationUtils;
+import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.message.DestinationAndMessage;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Packet;
 
 import java.io.IOException;
@@ -18,18 +19,20 @@ public class DeadDropServer {
     private final int myPort;
     private final String targetHost;
     private final int targetPort;
+    private final Endpoint endpoint;
     private final SphinxNode node;
     private final Store store;
 
-    public DeadDropServer(final int myPort, final String targetHost, final int targetPort, final SphinxNode node) {
+    public DeadDropServer(final int myPort, final String targetHost, final int targetPort, final Endpoint endpoint, final SphinxNode node) {
         this.myPort = myPort;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
+        this.endpoint = endpoint;
         this.node = node;
         this.store = new Store();
     }
 
-    public void listen() throws IOException {
+    public void listen() throws IOException, SphinxException {
         try (final var serverSocket = new ServerSocket(myPort)) {
             Logger.getGlobal().info("Opened socket on port %s".formatted(myPort));
             while (true) {
@@ -38,11 +41,24 @@ public class DeadDropServer {
                     final var packetList = this.handleConnection(socket);
                     this.handle(packetList);
                 }
+                Logger.getGlobal().info("Sending %s reply(s)".formatted(store.size()));
+                Logger.getGlobal().info("Opening outgoing Socket to %s:%s".formatted(targetHost, targetPort));
+                try (final var outgoingSocket = new Socket(targetHost, targetPort)) {
+                    try (final var os = outgoingSocket.getOutputStream()) {
+                        while (!store.isEmpty()) {
+                            final var replyPacket = endpoint.repackReply(store.popReply());
+                            final var replyBytes = node.client().packMessage(replyPacket);
+                            os.write(replyBytes);
+                            Logger.getGlobal().info("Wrote %s bytes".formatted(replyBytes.length));
+                        }
+                    }
+                }
+                Logger.getGlobal().info("Sent reply(s)");
             }
         }
     }
 
-    private List<DestinationAndMessage> handleConnection(Socket socket) throws IOException {
+    private List<DestinationAndMessage> handleConnection(Socket socket) throws IOException, SphinxException {
         final var messageList = new LinkedList<DestinationAndMessage>();
         try (final var is = socket.getInputStream()) {
             do {
@@ -66,9 +82,7 @@ public class DeadDropServer {
         for (final var msg : messages) {
             final var packet = Packet.parse(msg.message());
             final var bucketEntry = new BucketEntry(packet.bucketId(), packet);
-            store.put(bucketEntry);
+            store.add(bucketEntry);
         }
-        store.forEach(System.out::println);
-        store.clear();
     }
 }

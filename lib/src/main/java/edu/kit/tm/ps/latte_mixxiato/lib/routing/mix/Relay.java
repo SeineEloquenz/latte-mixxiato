@@ -3,6 +3,7 @@ package edu.kit.tm.ps.latte_mixxiato.lib.routing.mix;
 import com.google.gson.JsonObject;
 import com.robertsoultanaev.javasphinx.SerializationUtils;
 import com.robertsoultanaev.javasphinx.SphinxClient;
+import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import org.bouncycastle.math.ec.ECPoint;
 
@@ -25,7 +26,7 @@ public record Relay(String host, int gatewayPort, int deadDropPort, ECPoint publ
      * @param packet packet to send
      * @throws IOException thrown if an error occurs opening the connection to the host
      */
-    public void send(SphinxClient client, SphinxPacket packet) throws IOException {
+    public void send(SphinxClient client, SphinxPacket packet) throws IOException, SphinxException {
         try (final var socket = new Socket(host, gatewayPort)) {
             final var os = socket.getOutputStream();
             os.write(client.packMessage(packet));
