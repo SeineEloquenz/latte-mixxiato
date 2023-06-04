@@ -16,7 +16,7 @@ public class Client {
         this.sender = sender;
     }
 
-    public void sendMessage(String message) throws SphinxException {
-        sender.enqueueToSend(new InwardMessage(message.getBytes(StandardCharsets.UTF_8)));
+    public void sendMessage(long peerSeed, String message) throws SphinxException {
+        sender.enqueueToSend(new InwardMessage(peerSeed, message.getBytes(StandardCharsets.UTF_8)));
     }
 }

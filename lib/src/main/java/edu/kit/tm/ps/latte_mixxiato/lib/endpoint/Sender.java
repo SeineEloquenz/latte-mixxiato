@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -24,11 +25,13 @@ public class Sender {
     private final Gateway gateway;
     private final MessageBuilder messageBuilder;
     private final Queue<SphinxPacket> packetQueue;
+    private final Random random;
 
     public Sender(final Gateway gateway, final MessageBuilder messageBuilder, final SphinxClient client, final RoundProvider provider) {
         this.gateway = gateway;
         this.messageBuilder = messageBuilder;
         this.packetQueue = new LinkedList<>();
+        this.random = new Random();
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         service.scheduleAtFixedRate(
                 () -> {
@@ -60,7 +63,7 @@ public class Sender {
     private Optional<SphinxPacket> generateNoisePacket() {
         final List<SphinxPacket> packets;
         try {
-            packets = messageBuilder.splitIntoSphinxPackets(new InwardMessage("<empty>".getBytes(StandardCharsets.UTF_8)));
+            packets = messageBuilder.splitIntoSphinxPackets(new InwardMessage(random.nextLong(), "<empty>".getBytes(StandardCharsets.UTF_8)));
             return Optional.ofNullable(packets.get(0));
         } catch (SphinxException e) {
             Logger.getGlobal().warning("Failed to generate noise packet, Stacktrace:");

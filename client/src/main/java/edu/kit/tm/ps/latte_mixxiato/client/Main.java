@@ -39,7 +39,7 @@ public class Main {
 
         final var gateway = coordinatorClient.gateway();
 
-        final var endpoint = new MessageBuilder(new BucketIdGenerator(seed), gateway, coordinatorClient.relay(), coordinatorClient.deadDrop(), sphinxFactory.client());
+        final var endpoint = new MessageBuilder(new BucketIdGenerator(), gateway, coordinatorClient.relay(), coordinatorClient.deadDrop(), sphinxFactory.client());
         final var sender = new Sender(gateway, endpoint, sphinxFactory.client(), new FixedRoundProvider(55, ChronoUnit.SECONDS));
         final var receiver = new Receiver(assembledMessage -> System.out.println(assembledMessage.messageContent()));
 
@@ -61,22 +61,22 @@ public class Main {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        messages.forEach(msg -> enqueue(client, msg));
+        messages.forEach(msg -> enqueue(client, seed, msg));
         Logger.getGlobal().info("Type your messages and confirm with enter. Entering :q will quit.");
         while (scanner.hasNext()) {
             final var line = scanner.nextLine();
             if (":q".equals(line)) {
                 break;
             }
-            enqueue(client, line);
+            enqueue(client, seed , line);
         }
         Logger.getGlobal().info("Goodbye.");
     }
 
-    private static void enqueue(Client client, String message) {
+    private static void enqueue(Client client, long peerSeed, String message) {
         Logger.getGlobal().info("Enqueueing message %s".formatted(message));
         try {
-            client.sendMessage(message);
+            client.sendMessage(peerSeed, message);
         } catch (SphinxException e) {
             e.printStackTrace();
         }
