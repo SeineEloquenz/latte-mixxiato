@@ -1,4 +1,4 @@
-package edu.kit.tm.ps.latte_mixxiato.lib.routing;
+package edu.kit.tm.ps.latte_mixxiato.lib.routing.mix;
 
 import com.google.gson.JsonObject;
 import com.robertsoultanaev.javasphinx.SerializationUtils;
@@ -9,14 +9,13 @@ import org.bouncycastle.math.ec.ECPoint;
 import java.io.IOException;
 import java.net.Socket;
 
-public record MixNode(MixType type, String host, int port, ECPoint publicKey) {
+public record DeadDrop(String host, int relayPort, ECPoint publicKey) {
 
-    public static MixNode fromJson(JsonObject json) {
-        final var type = json.get("type").getAsInt();
+    public static DeadDrop fromJson(JsonObject json) {
         final var host = json.get("host").getAsString();
-        final var port = json.get("port").getAsInt();
+        final var port = json.get("gatewayPort").getAsInt();
         final var pubKey = SerializationUtils.decodeECPoint(SerializationUtils.base64decode(json.get("pubKey").getAsString()));
-        return new MixNode(MixType.values()[type], host, port, pubKey);
+        return new DeadDrop(host, port, pubKey);
     }
 
     /**
@@ -26,7 +25,7 @@ public record MixNode(MixType type, String host, int port, ECPoint publicKey) {
      * @throws IOException thrown if an error occurs opening the connection to the host
      */
     public void send(SphinxClient client, SphinxPacket packet) throws IOException {
-        try (final var socket = new Socket(host, port)) {
+        try (final var socket = new Socket(host, relayPort)) {
             final var os = socket.getOutputStream();
             os.write(client.packMessage(packet));
         }
@@ -34,9 +33,8 @@ public record MixNode(MixType type, String host, int port, ECPoint publicKey) {
 
     public JsonObject toJson() {
         final var json = new JsonObject();
-        json.addProperty("type", type.ordinal());
         json.addProperty("host", host);
-        json.addProperty("port", port);
+        json.addProperty("gatewayPort", relayPort);
         json.addProperty("pubKey", SerializationUtils.base64encode(SerializationUtils.encodeECPoint(publicKey)));
         return json;
     }

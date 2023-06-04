@@ -15,7 +15,7 @@ services:
     - ./coord.json:/opt/app/coord.json
     depends_on:
     - coordinator
-    command: "gateway 8888"
+    command: "gateway 8000 8001"
   relay:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-relay:latest
     networks:
@@ -24,7 +24,7 @@ services:
     - ./coord.json:/opt/app/coord.json
     depends_on:
     - coordinator
-    command: "relay 8888"
+    command: "relay 8001 8002"
   dead-drop:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-dead-drop:latest
     networks:
@@ -33,14 +33,14 @@ services:
     - ./coord.json:/opt/app/coord.json
     depends_on:
     - coordinator
-    command: "dead-drop 8888"
+    command: "dead-drop 8003"
   client:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
     networks:
     - mixnet
     volumes:
     - ./coord.json:/opt/app/coord.json
-    command: "dead-drop 8888 hello this is obi wan"
+    command: "dead-drop 8003 hello this is obi wan"
     depends_on:
     - coordinator
     - gateway

@@ -1,35 +1,48 @@
 package edu.kit.tm.ps.latte_mixxiato.coordinator;
 
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNode;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixType;
-import org.bouncycastle.math.ec.ECPoint;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Coordinator {
 
-    private final Map<MixType, MixNode> mixes;
+    private Gateway gateway;
+    private Relay relay;
+    private DeadDrop deadDrop;
 
     public Coordinator() {
-        this.mixes = new ConcurrentHashMap<>();
+        this.gateway = null;
+        this.relay = null;
+        this.deadDrop = null;
     }
 
-    public MixNode register(MixType type, String host, int port, ECPoint pubKey) {
-        final var node = new MixNode(type, host, port, pubKey);
-        mixes.put(type, node);
-        return node;
+    public void register(Gateway gateway) {
+        this.gateway = gateway;
     }
 
-    public Optional<MixNode> getNode(MixType type) {
-        return Optional.ofNullable(mixes.get(type));
+    public void register(Relay relay) {
+        this.relay = relay;
     }
 
-    public Set<MixNode> all() {
-        return new HashSet<>(mixes.values());
+    public void register(DeadDrop deadDrop) {
+        this.deadDrop = deadDrop;
+    }
+
+    public boolean ready() {
+        return gateway != null && relay != null && deadDrop != null;
+    }
+
+    public Optional<Gateway> gateway() {
+        return Optional.ofNullable(gateway);
+    }
+
+    public Optional<Relay> relay() {
+        return Optional.ofNullable(relay);
+    }
+
+    public Optional<DeadDrop> deadDrop() {
+        return Optional.ofNullable(deadDrop);
     }
 }

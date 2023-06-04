@@ -5,7 +5,6 @@ import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Sender;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.FixedRoundProvider;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNodeRepository;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;
@@ -18,7 +17,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         if (args.length < 2) {
-            Logger.getGlobal().severe("You need to pass the recipient ip address and port");
+            Logger.getGlobal().severe("You need to pass the recipient ip address and gatewayPort");
             System.exit(1);
         }
         final var targetHost = args[0];
@@ -29,10 +28,12 @@ public class Main {
         final var messages = Arrays.stream(args).skip(2).toList();
 
         final var sphinxFactory = new DefaultSphinxFactory(); //TODO configure or get from coordinator
-        final var mixNodeRepository = coordinatorClient.waitForMixes();
+        coordinatorClient.waitUntilReady();
 
-        final var endpoint = new Endpoint(mixNodeRepository, MixNodeRepository.DESIRED_MIX_AMOUNT, sphinxFactory.client());
-        final var sender = new Sender(endpoint, sphinxFactory.client(), new FixedRoundProvider());
+        final var gateway = coordinatorClient.gateway();
+
+        final var endpoint = new Endpoint(gateway, coordinatorClient.relay(), coordinatorClient.deadDrop(), sphinxFactory.client());
+        final var sender = new Sender(gateway, endpoint, sphinxFactory.client(), new FixedRoundProvider());
         final var client = new Client(sender);
 
         final var scanner = new Scanner(System.in);

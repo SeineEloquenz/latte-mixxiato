@@ -11,14 +11,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class Relay {
+public class RelayServer {
 
     private final int myPort;
     private final String targetHost;
     private final int targetPort;
     private final SphinxNode node;
 
-    public Relay(final int myPort, final String targetHost, final int targetPort, final SphinxNode node) {
+    public RelayServer(final int myPort, final String targetHost, final int targetPort, final SphinxNode node) {
         this.myPort = myPort;
         this.targetHost = targetHost;
         this.targetPort = targetPort;

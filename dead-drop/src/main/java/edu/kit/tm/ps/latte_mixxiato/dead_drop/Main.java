@@ -3,7 +3,7 @@ package edu.kit.tm.ps.latte_mixxiato.dead_drop;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixType;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 2) {
-            Logger.getGlobal().severe("You need to pass the hostname and port the server is listening on");
+            Logger.getGlobal().severe("You need to pass the hostname and gatewayPort the server is listening on");
             System.exit(1);
         }
         final var hostname = args[0];
@@ -27,10 +27,12 @@ public class Main {
         final var keyPair = sphinxFactory.pkiGenerator().generateKeyPair();
         final var sphinxNode = sphinxFactory.node(keyPair.priv());
 
-        coordinatorClient.register(MixType.DEAD_DROP, hostname, port, keyPair.pub());
+        final var deadDrop = new DeadDrop(hostname, port, keyPair.pub());
+
+        coordinatorClient.register(deadDrop);
         Logger.getGlobal().info("Registered with coordinator");
 
-        final var mixNodeRepository = coordinatorClient.waitForMixes();
+        coordinatorClient.waitUntilReady();
 
         try (final var serverSocket = new ServerSocket(port)) {
             while (true) {

@@ -3,7 +3,7 @@ package edu.kit.tm.ps.latte_mixxiato.gateway;
 import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.ProcessedPacket;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.RoundProvider;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNode;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -18,13 +18,13 @@ public class SynchronizingDispatcher {
     private final List<ProcessedPacket> packets;
     private final ScheduledExecutorService dispatchService;
 
-    public SynchronizingDispatcher(final SphinxNode node, final MixNode relay, RoundProvider provider) {
+    public SynchronizingDispatcher(final SphinxNode node, final Relay relay, RoundProvider provider) {
         this.packets = new LinkedList<>();
         this.dispatchService = Executors.newScheduledThreadPool(4);
         this.dispatchService.scheduleAtFixedRate(
                 () -> {
                     Logger.getGlobal().info("Reached round end, dispatching all messages now.");
-                    try (final var socket = new Socket(relay.host(), relay.port())) {
+                    try (final var socket = new Socket(relay.host(), relay.gatewayPort())) {
                         final var os = socket.getOutputStream();
                         for (ProcessedPacket packet : packets) {
                             os.write(node.client().packMessage(node.repack(packet)));
