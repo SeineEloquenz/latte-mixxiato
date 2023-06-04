@@ -12,18 +12,12 @@ import java.net.InetSocketAddress;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        if (args.length < 2) {
-            Logger.getGlobal().severe("You need to pass the recipient ip address and gatewayPort");
-            System.exit(1);
-        }
-        final var targetHost = args[0];
-        final var targetPort = Integer.parseInt(args[1]);
-        final var targetAddress = new InetSocketAddress(targetHost, targetPort);
         final var coordinatorClient = new CoordinatorClient(CoordinatorConfig.load());
 
         final var messages = Arrays.stream(args).skip(2).toList();
@@ -44,20 +38,20 @@ public class Main {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        messages.forEach(msg -> enqueue(client, targetAddress, msg));
+        messages.forEach(msg -> enqueue(client, msg));
         Logger.getGlobal().info("Type your messages and confirm with enter. Entering :q will quit.");
         while (scanner.hasNext()) {
             final var line = scanner.nextLine();
             if (":q".equals(line)) {
                 break;
             }
-            enqueue(client, targetAddress, line);
+            enqueue(client, line);
         }
         Logger.getGlobal().info("Goodbye.");
     }
 
-    private static void enqueue(Client client, InetSocketAddress destination, String message) {
-        Logger.getGlobal().info("Enqueueing message %s to %s%n".formatted(message, destination));
-        client.sendMessage(destination, message);
+    private static void enqueue(Client client, String message) {
+        Logger.getGlobal().info("Enqueueing message %s".formatted(message));
+        client.sendMessage(message);
     }
 }

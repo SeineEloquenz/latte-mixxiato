@@ -34,7 +34,7 @@ public class SynchronizingDispatcher {
                             }
                         }
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
                     }
                     packets.clear();
                 },

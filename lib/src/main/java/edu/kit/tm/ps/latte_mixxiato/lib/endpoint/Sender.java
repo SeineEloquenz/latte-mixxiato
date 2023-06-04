@@ -4,7 +4,7 @@ import com.robertsoultanaev.javasphinx.SphinxClient;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.RoundProvider;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.OutwardMessage;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.InwardMessage;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -45,7 +45,7 @@ public class Sender {
                 TimeUnit.MILLISECONDS);
     }
 
-    public void enqueueToSend(OutwardMessage message) {
+    public void enqueueToSend(InwardMessage message) {
         final var packets = endpoint.splitIntoSphinxPackets(message);
         packetQueue.addAll(packets);
     }

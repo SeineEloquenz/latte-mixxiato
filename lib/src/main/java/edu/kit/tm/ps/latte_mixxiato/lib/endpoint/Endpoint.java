@@ -4,23 +4,18 @@ import com.robertsoultanaev.javasphinx.SerializationUtils;
 import com.robertsoultanaev.javasphinx.SphinxClient;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import com.robertsoultanaev.javasphinx.packet.header.PacketContent;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.DestinationEncoding;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.OutwardMessage;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.InwardMessage;
 import org.bouncycastle.math.ec.ECPoint;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 public class Endpoint {
-
-    public static int PACKET_HEADER_SIZE = 24;
 
     private record RoutingInformation(byte[][] nodesRouting, ECPoint[] nodeKeys, int firstNodeId) {
     }
@@ -37,18 +32,22 @@ public class Endpoint {
         this.client = client;
     }
 
-    public List<SphinxPacket> splitIntoSphinxPackets(OutwardMessage message) {
-        UUID messageId = UUID.randomUUID();
-        byte[] dest = DestinationEncoding.encode(message.address());
+    public List<SphinxPacket> splitIntoSphinxPackets(InwardMessage message) {
+        final var messageId = UUID.randomUUID();
+        byte[] dest = SerializationUtils.encodeLong(UUID.randomUUID().getMostSignificantBits());
 
-        final var packetPayloadSize = client.getMaxPayloadSize() - dest.length - PACKET_HEADER_SIZE;
+        final var packetPayloadSize = client.getMaxPayloadSize() - dest.length - Packet.HEADER_SIZE;
         final var packetsInMessage = (int) Math.ceil((double) message.message().length / packetPayloadSize);
         final var sphinxPackets = new LinkedList<SphinxPacket>();
 
         for (int i = 0; i < packetsInMessage; i++) {
-            final var packetHeader = ByteBuffer.allocate(Endpoint.PACKET_HEADER_SIZE);
+            final var bucketId = UUID.randomUUID();
+
+            final var packetHeader = ByteBuffer.allocate(Packet.HEADER_SIZE);
             packetHeader.putLong(messageId.getMostSignificantBits());
             packetHeader.putLong(messageId.getLeastSignificantBits());
+            packetHeader.putLong(bucketId.getMostSignificantBits());
+            packetHeader.putLong(bucketId.getLeastSignificantBits());
             packetHeader.putInt(packetsInMessage);
             packetHeader.putInt(i);
 
@@ -88,19 +87,5 @@ public class Endpoint {
         System.arraycopy(source, offset, result, 0, numBytes);
 
         return result;
-    }
-
-    public Packet parseMessageToPacket(byte[] message) {
-        byte[] headerBytes = Arrays.copyOfRange(message, 0, Endpoint.PACKET_HEADER_SIZE);
-        ByteBuffer byteBuffer = ByteBuffer.wrap(headerBytes);
-        long uuidHigh = byteBuffer.getLong();
-        long uuidLow = byteBuffer.getLong();
-
-        int packetsInMessage = byteBuffer.getInt();
-        int sequenceNumber = byteBuffer.getInt();
-        final var uuid = new UUID(uuidHigh, uuidLow);
-        byte[] payload = Arrays.copyOfRange(message, 24, message.length);
-
-        return new Packet(uuid, sequenceNumber, packetsInMessage, payload);
     }
 }

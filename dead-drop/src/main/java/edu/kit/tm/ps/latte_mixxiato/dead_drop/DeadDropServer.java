@@ -1,10 +1,10 @@
 package edu.kit.tm.ps.latte_mixxiato.dead_drop;
 
+import com.robertsoultanaev.javasphinx.SerializationUtils;
 import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
-import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import com.robertsoultanaev.javasphinx.packet.message.DestinationAndMessage;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.DestinationEncoding;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Packet;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -19,12 +19,14 @@ public class DeadDropServer {
     private final String targetHost;
     private final int targetPort;
     private final SphinxNode node;
+    private final Store store;
 
     public DeadDropServer(final int myPort, final String targetHost, final int targetPort, final SphinxNode node) {
         this.myPort = myPort;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
         this.node = node;
+        this.store = new Store();
     }
 
     public void listen() throws IOException {
@@ -60,9 +62,13 @@ public class DeadDropServer {
         return messageList;
     }
 
-    public void handle(List<DestinationAndMessage> messages) throws IOException {
+    public void handle(List<DestinationAndMessage> messages) {
         for (final var msg : messages) {
-            Logger.getGlobal().info("Received message to %s".formatted(DestinationEncoding.decode(msg.destination())));
+            final var packet = Packet.parse(msg.message());
+            final var bucketEntry = new BucketEntry(packet.bucketId(), packet);
+            store.put(bucketEntry);
         }
+        store.forEach(System.out::println);
+        store.clear();
     }
 }
