@@ -30,7 +30,7 @@ public class Main {
         final var keyPair = sphinxFactory.pkiGenerator().generateKeyPair();
         final var sphinxNode = sphinxFactory.node(keyPair.priv());
 
-        coordinatorClient.register(MixType.DEAD_DROP, hostname, port, keyPair.pub());
+        coordinatorClient.register(MixType.RELAY, hostname, port, keyPair.pub());
         Logger.getGlobal().info("Registered with coordinator");
 
         final var mixNodeRepository = coordinatorClient.waitForMixes();
