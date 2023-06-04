@@ -34,18 +34,30 @@ services:
     depends_on:
     - coordinator
     command: "dead-drop 8003"
-  client:
+  client1:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
     networks:
     - mixnet
     volumes:
     - ./coord.json:/opt/app/coord.json
-    command: "8000 hello this is obi wan"
+    command: "8000 i have the high ground!"
     depends_on:
     - coordinator
     - gateway
     - relay
     - dead-drop
+  client2:
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
+    networks:
+      - mixnet
+    volumes:
+      - ./coord.json:/opt/app/coord.json
+    command: "8000"
+    depends_on:
+      - coordinator
+      - gateway
+      - relay
+      - dead-drop
 
 networks:
   mixnet:

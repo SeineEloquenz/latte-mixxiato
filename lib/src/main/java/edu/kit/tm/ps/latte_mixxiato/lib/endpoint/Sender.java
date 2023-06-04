@@ -9,7 +9,9 @@ import edu.kit.tm.ps.latte_mixxiato.lib.routing.InwardMessage;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.Executors;
@@ -31,17 +33,19 @@ public class Sender {
         service.scheduleAtFixedRate(
                 () -> {
                     Logger.getGlobal().info("Reached round end, sending message.");
-                    Optional.ofNullable(packetQueue.peek()).ifPresent(packet -> {
-                        try {
-                            this.send(client, packet);
-                            packetQueue.poll();
-                        } catch (IOException e) {
-                            Logger.getGlobal().warning("Failed to send packet Trying again in next round. Stacktrace: ");
-                            e.printStackTrace();
-                        } catch (SphinxException e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    Optional.ofNullable(packetQueue.peek())
+                            .or(this::generateNoisePacket)
+                            .ifPresent(packet -> {
+                                try {
+                                    this.send(client, packet);
+                                    packetQueue.poll();
+                                } catch (IOException e) {
+                                    Logger.getGlobal().warning("Failed to send packet Trying again in next round. Stacktrace: ");
+                                    e.printStackTrace();
+                                } catch (SphinxException e) {
+                                    e.printStackTrace();
+                                }
+                            });
                 },
                 provider.timeUntilRoundEnd().time(),
                 10 * 1000,
@@ -51,6 +55,18 @@ public class Sender {
     public void enqueueToSend(InwardMessage message) throws SphinxException {
         final var packets = endpoint.splitIntoSphinxPackets(message);
         packetQueue.addAll(packets);
+    }
+
+    private Optional<SphinxPacket> generateNoisePacket() {
+        final List<SphinxPacket> packets;
+        try {
+            packets = endpoint.splitIntoSphinxPackets(new InwardMessage("<empty>".getBytes(StandardCharsets.UTF_8)));
+            return Optional.ofNullable(packets.get(0));
+        } catch (SphinxException e) {
+            Logger.getGlobal().warning("Failed to generate noise packet, Stacktrace:");
+            e.printStackTrace();
+            return Optional.empty();
+        }
     }
 
     private void send(SphinxClient client, SphinxPacket packet) throws IOException, SphinxException {
