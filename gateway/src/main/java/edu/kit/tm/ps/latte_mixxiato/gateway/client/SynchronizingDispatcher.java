@@ -36,9 +36,7 @@ public class SynchronizingDispatcher {
                             for (final var packetWithSender : packets) {
                                 final var packedMessage = node.client().packMessage(packetWithSender.packet());
                                 os.write(packedMessage);
-                                Logger.getGlobal().info("Wrote %s bytes".formatted(packedMessage.length));
                                 clientList.record(packetWithSender.clientData());
-                                Logger.getGlobal().info("Wrote packet to OutputStream.");
                             }
                         }
                     } catch (IOException | SphinxException e) {

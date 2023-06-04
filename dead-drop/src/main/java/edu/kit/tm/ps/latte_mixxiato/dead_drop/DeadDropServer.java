@@ -41,15 +41,13 @@ public class DeadDropServer {
                     final var packetList = this.handleConnection(socket);
                     this.handle(packetList);
                 }
-                Logger.getGlobal().info("Sending %s reply(s)".formatted(store.size()));
-                Logger.getGlobal().info("Opening outgoing Socket to %s:%s".formatted(targetHost, targetPort));
+                Logger.getGlobal().info("Sending %s reply(s) to %s:%s".formatted(store.size(), targetHost, targetPort));
                 try (final var outgoingSocket = new Socket(targetHost, targetPort)) {
                     try (final var os = outgoingSocket.getOutputStream()) {
                         while (!store.isEmpty()) {
                             final var replyPacket = endpoint.repackReply(store.popReply());
                             final var replyBytes = node.client().packMessage(replyPacket);
                             os.write(replyBytes);
-                            Logger.getGlobal().info("Wrote %s bytes".formatted(replyBytes.length));
                         }
                     }
                 }

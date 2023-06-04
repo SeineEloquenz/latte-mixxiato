@@ -40,7 +40,7 @@ services:
     - mixnet
     volumes:
     - ./coord.json:/opt/app/coord.json
-    command: "hello this is obi wan"
+    command: "8000 hello this is obi wan"
     depends_on:
     - coordinator
     - gateway
