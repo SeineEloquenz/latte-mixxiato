@@ -44,9 +44,7 @@ public class RelayServer {
         try (final var is = socket.getInputStream()) {
             do {
                 final var packetBytes = is.readNBytes(1254);
-                Logger.getGlobal().info("Got packet, processing.");
                 final var processedPacket = node.sphinxProcess(node.client().unpackMessage(packetBytes).packetContent());
-                Logger.getGlobal().info("Packet processed successfully.");
                 final var flag = processedPacket.routingFlag();
                 if (flag.equals(RoutingFlag.RELAY)) {
                     packetList.add(node.repack(processedPacket));
