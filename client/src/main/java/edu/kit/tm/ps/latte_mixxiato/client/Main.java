@@ -9,6 +9,7 @@ import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -33,7 +34,7 @@ public class Main {
         final var gateway = coordinatorClient.gateway();
 
         final var endpoint = new Endpoint(gateway, coordinatorClient.relay(), coordinatorClient.deadDrop(), sphinxFactory.client());
-        final var sender = new Sender(gateway, endpoint, sphinxFactory.client(), new FixedRoundProvider());
+        final var sender = new Sender(gateway, endpoint, sphinxFactory.client(), new FixedRoundProvider(55, ChronoUnit.SECONDS));
         final var client = new Client(sender);
 
         final var scanner = new Scanner(System.in);

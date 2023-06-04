@@ -7,6 +7,7 @@ import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 import java.util.logging.Logger;
 
 public class Main {
@@ -30,7 +31,7 @@ public class Main {
         coordinatorClient.waitUntilReady();
         final var sphinxNode = sphinxFactory.node(keyPair.priv());
 
-        final SynchronizingDispatcher dispatcher = new SynchronizingDispatcher(sphinxNode, coordinatorClient.relay(), new FixedRoundProvider());
+        final SynchronizingDispatcher dispatcher = new SynchronizingDispatcher(sphinxNode, coordinatorClient.relay(), new FixedRoundProvider(1, ChronoUnit.MINUTES));
 
         //Actual server startup
         final var server = new Server(clientPort, sphinxFactory.client(), sphinxFactory.node(keyPair.priv()), dispatcher);

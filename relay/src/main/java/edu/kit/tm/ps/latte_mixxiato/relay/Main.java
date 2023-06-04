@@ -13,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 3) {
-            Logger.getGlobal().severe("You need to pass the hostname, gateway gatewayPort and dead drop gatewayPort the server is listening on");
+            Logger.getGlobal().severe("You need to pass the hostname, gateway port and dead drop port the server is listening on");
             System.exit(1);
         }
         final var hostname = args[0];
@@ -33,21 +33,21 @@ public class Main {
 
         final var gateway = coordinatorClient.gateway();
         final var deadDrop = coordinatorClient.deadDrop();
-        final var gatewayRelay = new RelayServer(gatewayPort, gateway.host(), gateway.relayPort(), sphinxNode);
-        final var deadDropRelay = new RelayServer(deadDropPort, deadDrop.host(), deadDrop.relayPort(), sphinxNode);
+        final var gatewayRelay = new RelayServer(gatewayPort, deadDrop.host(), deadDrop.relayPort(), sphinxNode);
+        final var deadDropRelay = new RelayServer(deadDropPort, gateway.host(), gateway.relayPort(), sphinxNode);
         final var executor = Executors.newFixedThreadPool(2);
         executor.submit(() -> {
             try {
                 gatewayRelay.listen();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         });
         executor.submit(() -> {
             try {
                 deadDropRelay.listen();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         });
     }

@@ -23,11 +23,15 @@ public class SynchronizingDispatcher {
         this.dispatchService = Executors.newScheduledThreadPool(4);
         this.dispatchService.scheduleAtFixedRate(
                 () -> {
-                    Logger.getGlobal().info("Reached round end, dispatching all messages now.");
+                    Logger.getGlobal().info("Reached round end, dispatching %s message(s) now.".formatted(packets.size()));
                     try (final var socket = new Socket(relay.host(), relay.gatewayPort())) {
-                        final var os = socket.getOutputStream();
-                        for (ProcessedPacket packet : packets) {
-                            os.write(node.client().packMessage(node.repack(packet)));
+                        try (final var os = socket.getOutputStream()) {
+                            for (ProcessedPacket packet : packets) {
+                                final var packedMessage = node.client().packMessage(node.repack(packet));
+                                Logger.getGlobal().info("Wrote %s bytes".formatted(packedMessage.length));
+                                os.write(packedMessage);
+                                Logger.getGlobal().info("Wrote packet to OutputStream.");
+                            }
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
