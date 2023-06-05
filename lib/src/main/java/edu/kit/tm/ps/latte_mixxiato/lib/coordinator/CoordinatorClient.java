@@ -11,7 +11,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 public class CoordinatorClient {
 

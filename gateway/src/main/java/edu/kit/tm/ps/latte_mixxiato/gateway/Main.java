@@ -2,8 +2,8 @@ package edu.kit.tm.ps.latte_mixxiato.gateway;
 
 import edu.kit.tm.ps.latte_mixxiato.gateway.client.ClientGateway;
 import edu.kit.tm.ps.latte_mixxiato.gateway.client.SynchronizingDispatcher;
-import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientList;
 import edu.kit.tm.ps.latte_mixxiato.gateway.relay.RelayGateway;
+import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientList;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
@@ -13,7 +13,6 @@ import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
-import java.util.logging.Logger;
 
 public class Main {
 

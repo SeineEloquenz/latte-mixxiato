@@ -4,9 +4,7 @@ import com.robertsoultanaev.javasphinx.SphinxException;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Sender;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.InwardMessage;
 
-import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 public class Client {
 

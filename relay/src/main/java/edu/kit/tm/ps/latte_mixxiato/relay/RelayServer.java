@@ -5,14 +5,12 @@ import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class RelayServer {
 

@@ -1,8 +1,5 @@
 package edu.kit.tm.ps.latte_mixxiato.client;
 
-import com.robertsoultanaev.javasphinx.SphinxException;
-import com.robertsoultanaev.javasphinx.packet.message.DestinationAndMessage;
-import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Packet;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Receiver;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
@@ -10,9 +7,6 @@ import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Logger;
 
 public class ReplyServer {
 

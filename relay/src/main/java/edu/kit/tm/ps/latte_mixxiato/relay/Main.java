@@ -9,7 +9,6 @@ import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
 public class Main {
 

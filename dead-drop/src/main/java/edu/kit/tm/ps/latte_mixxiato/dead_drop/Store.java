@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public class Store {
 

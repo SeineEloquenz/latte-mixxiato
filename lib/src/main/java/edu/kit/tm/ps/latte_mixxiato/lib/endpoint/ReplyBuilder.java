@@ -4,7 +4,6 @@ import com.robertsoultanaev.javasphinx.SerializationUtils;
 import com.robertsoultanaev.javasphinx.SphinxClient;
 import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
-import com.robertsoultanaev.javasphinx.packet.header.PacketContent;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;

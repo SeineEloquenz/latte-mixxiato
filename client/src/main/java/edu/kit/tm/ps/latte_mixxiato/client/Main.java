@@ -5,7 +5,6 @@ import edu.kit.tm.ps.latte_mixxiato.lib.client.ClientInfo;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.BucketIdGenerator;
-import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.MessageBuilder;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Receiver;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Sender;
@@ -18,7 +17,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
 public class Main {
 

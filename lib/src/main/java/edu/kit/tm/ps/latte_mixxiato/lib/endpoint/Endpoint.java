@@ -1,6 +1,5 @@
 package edu.kit.tm.ps.latte_mixxiato.lib.endpoint;
 
-import com.robertsoultanaev.javasphinx.SerializationUtils;
 import com.robertsoultanaev.javasphinx.SphinxClient;
 import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
@@ -8,12 +7,7 @@ import com.robertsoultanaev.javasphinx.packet.header.PacketContent;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.InwardMessage;
 import org.bouncycastle.math.ec.ECPoint;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
 
 public abstract class Endpoint {
 

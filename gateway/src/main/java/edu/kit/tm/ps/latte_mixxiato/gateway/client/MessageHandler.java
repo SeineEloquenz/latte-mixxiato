@@ -12,7 +12,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.logging.Logger;
 
 public class MessageHandler extends ChannelInboundHandlerAdapter {
 

@@ -9,8 +9,6 @@ import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
 import org.eclipse.jetty.server.Response;
 import spark.Spark;
 
-import java.util.logging.Logger;
-
 public class Main {
     public static void main(String[] args) {
         final var coordinator = new Coordinator();
