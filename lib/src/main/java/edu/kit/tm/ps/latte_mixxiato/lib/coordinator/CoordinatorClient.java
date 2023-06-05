@@ -2,9 +2,9 @@ package edu.kit.tm.ps.latte_mixxiato.lib.coordinator;
 
 import com.google.gson.JsonParser;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.DeadDrop;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Gateway;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Relay;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -103,6 +103,7 @@ public class CoordinatorClient {
         LatteLogger.get().info("Registered with coordinator");
     }
 
+    @SuppressWarnings("BusyWait")
     public void waitUntilReady() throws IOException {
         //TODO do this in a less bad way
         while (!this.ready()) {

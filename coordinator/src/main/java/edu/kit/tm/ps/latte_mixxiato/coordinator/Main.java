@@ -3,9 +3,9 @@ package edu.kit.tm.ps.latte_mixxiato.coordinator;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.DeadDrop;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Gateway;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Relay;
 import org.eclipse.jetty.server.Response;
 import spark.Spark;
 

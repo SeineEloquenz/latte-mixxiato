@@ -1,8 +1,8 @@
 package edu.kit.tm.ps.latte_mixxiato.coordinator;
 
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.DeadDrop;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Gateway;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Relay;
 
 import java.util.Optional;
 

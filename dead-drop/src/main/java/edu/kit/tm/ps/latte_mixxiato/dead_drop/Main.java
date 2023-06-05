@@ -5,7 +5,7 @@ import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.ReplyBuilder;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;

@@ -4,9 +4,9 @@ import com.robertsoultanaev.javasphinx.SphinxClient;
 import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import com.robertsoultanaev.javasphinx.packet.header.PacketContent;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.DeadDrop;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Gateway;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Relay;
 import org.bouncycastle.math.ec.ECPoint;
 
 public abstract class Endpoint {

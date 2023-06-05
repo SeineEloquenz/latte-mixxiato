@@ -8,7 +8,7 @@ import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.FixedRoundProvider;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Gateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;

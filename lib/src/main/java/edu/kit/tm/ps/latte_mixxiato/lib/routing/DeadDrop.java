@@ -1,4 +1,4 @@
-package edu.kit.tm.ps.latte_mixxiato.lib.routing.mix;
+package edu.kit.tm.ps.latte_mixxiato.lib.routing;
 
 import com.google.gson.JsonObject;
 import com.robertsoultanaev.javasphinx.SerializationUtils;

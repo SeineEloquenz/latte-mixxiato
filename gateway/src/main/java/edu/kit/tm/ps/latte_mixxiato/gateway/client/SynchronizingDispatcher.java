@@ -8,7 +8,7 @@ import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientList;
 import edu.kit.tm.ps.latte_mixxiato.gateway.routing.PacketWithSender;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.RoundProvider;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Relay;
 
 import java.io.IOException;
 import java.net.Socket;

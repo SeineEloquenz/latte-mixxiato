@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record Packet(UUID uuid, UUID bucketId, int packetsInMessage, int sequenceNumber, byte[] payload) {
 
-    public static int HEADER_SIZE = 40;
+    public static final int HEADER_SIZE = 40;
 
     public static Packet parse(byte[] message) {
         byte[] headerBytes = Arrays.copyOfRange(message, 0, HEADER_SIZE);

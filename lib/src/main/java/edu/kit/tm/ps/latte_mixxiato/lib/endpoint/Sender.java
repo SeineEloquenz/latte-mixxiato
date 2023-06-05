@@ -5,8 +5,8 @@ import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.RoundProvider;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Gateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.InwardMessage;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
 
 import java.io.IOException;
 import java.net.Socket;
