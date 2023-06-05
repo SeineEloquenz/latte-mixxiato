@@ -3,16 +3,18 @@ package edu.kit.tm.ps.latte_mixxiato.gateway;
 import edu.kit.tm.ps.latte_mixxiato.gateway.client.ClientGateway;
 import edu.kit.tm.ps.latte_mixxiato.gateway.client.SynchronizingDispatcher;
 import edu.kit.tm.ps.latte_mixxiato.gateway.relay.RelayGateway;
-import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientList;
+import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientData;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.FixedRoundProvider;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Gateway;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Permuter;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
 public class Main {
 
@@ -35,13 +37,14 @@ public class Main {
         coordinatorClient.waitUntilReady();
         final var sphinxNode = sphinxFactory.node(keyPair.priv());
 
-        final var clientList = new ClientList();
+        final var clientList = new ArrayList<ClientData>();
+        final var permuter = new Permuter();
 
         final SynchronizingDispatcher dispatcher = new SynchronizingDispatcher(sphinxNode,
-                coordinatorClient.relay(), new FixedRoundProvider(1, ChronoUnit.MINUTES), clientList);
+                coordinatorClient.relay(), new FixedRoundProvider(1, ChronoUnit.MINUTES), clientList, permuter);
 
         final var clientGateway = new ClientGateway(clientPort, sphinxNode, dispatcher);
-        final var relayGateway = new RelayGateway(relayPort, clientList, sphinxNode);
+        final var relayGateway = new RelayGateway(relayPort, clientList, sphinxNode, permuter);
 
         //Actual server startup
         final var server = new Server(clientGateway, relayGateway);

@@ -4,10 +4,10 @@ import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.ProcessedPacket;
 import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientData;
-import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientList;
 import edu.kit.tm.ps.latte_mixxiato.gateway.routing.PacketWithSender;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.RoundProvider;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Permuter;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Relay;
 
 import java.io.IOException;
@@ -22,9 +22,11 @@ public class SynchronizingDispatcher {
     private final List<PacketWithSender> packets;
     private final SphinxNode node;
     private final ScheduledExecutorService dispatchService;
+    private final Permuter permuter;
 
-    public SynchronizingDispatcher(final SphinxNode node, final Relay relay, RoundProvider provider, final ClientList clientList) {
+    public SynchronizingDispatcher(final SphinxNode node, final Relay relay, RoundProvider provider, final List<ClientData> clientList, final Permuter permuter) {
         this.node = node;
+        this.permuter = permuter;
         this.packets = new LinkedList<>();
         this.dispatchService = Executors.newScheduledThreadPool(4);
         this.dispatchService.scheduleAtFixedRate(
@@ -32,13 +34,14 @@ public class SynchronizingDispatcher {
                     clientList.clear();
                     LatteLogger.get().info("Reached round end, sending %s message(s) to %s:%s."
                             .formatted(packets.size(), relay.host(), relay.gatewayPort()));
+                    final var reordered = permuter.permute(packets);
                     try (final var socket = new Socket(relay.host(), relay.gatewayPort())) {
                         try (final var os = socket.getOutputStream()) {
-                            for (final var packetWithSender : packets) {
+                            for (final var packetWithSender : reordered) {
                                 final var packedMessage = node.client().packMessage(packetWithSender.packet());
                                 os.write(packedMessage);
                                 LatteLogger.get().debug("Wrote %s bytes".formatted(packedMessage.length));
-                                clientList.record(packetWithSender.clientData());
+                                clientList.add(packetWithSender.clientData());
                             }
                         }
                     } catch (IOException | SphinxException e) {
