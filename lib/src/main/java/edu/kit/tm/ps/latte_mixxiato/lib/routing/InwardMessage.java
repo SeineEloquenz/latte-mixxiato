@@ -5,5 +5,5 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.UUID;
 
-public record InwardMessage(long peerSeed, byte[] message) {
+public record InwardMessage(byte[] message) {
 }

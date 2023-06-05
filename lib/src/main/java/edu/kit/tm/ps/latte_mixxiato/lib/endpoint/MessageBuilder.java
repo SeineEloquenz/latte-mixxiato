@@ -31,7 +31,7 @@ public class MessageBuilder extends Endpoint {
         final var sphinxPackets = new LinkedList<SphinxPacket>();
 
         for (int i = 0; i < packetsInMessage; i++) {
-            final var bucketId = idGenerator.next(message.peerSeed());
+            final var bucketId = idGenerator.next();
             byte[] packetPayload = copyUpToNum(message.message(), packetPayloadSize * i, packetPayloadSize);
             final var packet = new Packet(messageId, bucketId, packetsInMessage, i, packetPayload);
 
