@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 public class SynchronizingDispatcher {
     private final List<PacketWithSender> packets;
     private final SphinxNode node;
-    private final ScheduledExecutorService dispatchService;
     private final Relay relay;
     private final List<ClientData> clientList;
     private final Permuter permuter;
@@ -32,8 +31,8 @@ public class SynchronizingDispatcher {
         this.clientList = clientList;
         this.permuter = permuter;
         this.packets = new LinkedList<>();
-        this.dispatchService = Executors.newScheduledThreadPool(4);
-        this.dispatchService.scheduleAtFixedRate(
+        ScheduledExecutorService dispatchService = Executors.newSingleThreadScheduledExecutor();
+        dispatchService.scheduleAtFixedRate(
                 this::handleSend,
                 provider.timeUntilRoundEnd().time(),
                 10 * 1000,
