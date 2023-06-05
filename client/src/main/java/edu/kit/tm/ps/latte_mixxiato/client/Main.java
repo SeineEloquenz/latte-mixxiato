@@ -55,11 +55,6 @@ public class Main {
 
         final var scanner = new Scanner(System.in);
         LatteLogger.get().info("Sending messages from cli...");
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         messages.forEach(msg -> enqueue(client, msg));
         System.out.println("Type your messages and confirm with enter. Entering :q will quit.");
         while (scanner.hasNext()) {
