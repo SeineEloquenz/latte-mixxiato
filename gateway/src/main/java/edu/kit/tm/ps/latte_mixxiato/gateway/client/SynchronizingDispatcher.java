@@ -41,21 +41,24 @@ public class SynchronizingDispatcher {
 
     private void handleSend() {
         clientList.clear();
+        packets.forEach(packetWithSender -> clientList.add(packetWithSender.clientData()));
+
+        final var reordered = permuter.permute(packets);
+
         LatteLogger.get().info("Reached round end, sending %s message(s) to %s:%s."
                 .formatted(packets.size(), relay.host(), relay.gatewayPort()));
-        final var reordered = permuter.permute(packets);
         try (final var socket = new Socket(relay.host(), relay.gatewayPort())) {
             try (final var os = socket.getOutputStream()) {
                 for (final var packetWithSender : reordered) {
                     final var packedMessage = node.client().packMessage(packetWithSender.packet());
                     os.write(packedMessage);
                     LatteLogger.get().debug("Wrote %s bytes".formatted(packedMessage.length));
-                    clientList.add(packetWithSender.clientData());
                 }
             }
         } catch (IOException | SphinxException e) {
             e.printStackTrace();
         }
+
         packets.clear();
     }
 
