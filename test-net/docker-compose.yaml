@@ -58,6 +58,31 @@ services:
       - gateway
       - relay
       - dead-drop
+  client3:
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
+    networks:
+      - mixnet
+    volumes:
+      - ./coord.json:/opt/app/coord.json
+    command: "2000"
+    depends_on:
+      - coordinator
+      - gateway
+      - relay
+      - dead-drop
+  interactive-client:
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
+    networks:
+      - mixnet
+    volumes:
+      - ./coord.json:/opt/app/coord.json
+      - ./interactive-client/run.sh:/opt/app/run.sh
+    entrypoint: /bin/sh
+    depends_on:
+      - coordinator
+      - gateway
+      - relay
+      - dead-drop
 
 networks:
   mixnet:
