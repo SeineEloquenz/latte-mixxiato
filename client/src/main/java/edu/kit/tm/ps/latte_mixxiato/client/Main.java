@@ -53,9 +53,16 @@ public class Main {
             }
         });
 
-        final var scanner = new Scanner(System.in);
         LatteLogger.get().info("Sending messages from cli...");
         messages.forEach(msg -> enqueue(client, msg));
+
+        handleCli(client);
+
+        System.out.println("Goodbye.");
+    }
+
+    private static void handleCli(Client client) {
+        final var scanner = new Scanner(System.in);
         System.out.println("Type your messages and confirm with enter. Entering :q will quit.");
         while (scanner.hasNext()) {
             final var line = scanner.nextLine();
@@ -64,7 +71,6 @@ public class Main {
             }
             enqueue(client, line);
         }
-        System.out.println("Goodbye.");
     }
 
     private static void enqueue(Client client, String message) {
