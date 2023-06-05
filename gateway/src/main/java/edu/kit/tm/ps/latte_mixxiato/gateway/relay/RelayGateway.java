@@ -6,6 +6,7 @@ import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.message.DestinationAndMessage;
 import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientList;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Packet;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -28,11 +29,11 @@ public class RelayGateway {
 
     public void listen() throws IOException, SphinxException {
         try (final var serverSocket = new ServerSocket(port)) {
-            Logger.getGlobal().info("Opened socket on port %s".formatted(port));
+            LatteLogger.get().debug("Opened socket on port %s".formatted(port));
             while (true) {
                 final Queue<DestinationAndMessage> packetQueue;
                 try(final var socket = serverSocket.accept()) {
-                    Logger.getGlobal().info("Accepted Socket connection.");
+                    LatteLogger.get().debug("Accepted Socket connection.");
                     packetQueue = this.handleConnection(socket);
                 }
                 this.handle(packetQueue);
@@ -45,6 +46,9 @@ public class RelayGateway {
         try (final var is = socket.getInputStream()) {
             do {
                 final var packetBytes = is.readNBytes(1254);
+                if (packetBytes.length == 0) {
+                    break;
+                }
                 final var processedPacket = node.sphinxProcess(node.client().unpackMessage(packetBytes).packetContent());
                 final var flag = processedPacket.routingFlag();
                 if (flag.equals(RoutingFlag.DESTINATION)) {
@@ -52,11 +56,11 @@ public class RelayGateway {
                             .receiveForward(processedPacket.macKey(), processedPacket.packetContent().delta());
                     messageList.add(destinationAndMessage);
                 } else {
-                    Logger.getGlobal().warning("Received packet with wrong flag %s".formatted(flag));
+                    LatteLogger.get().warn("Received packet with wrong flag %s".formatted(flag));
                 }
-            } while (is.available() > 0);
+            } while (true);
         }
-        Logger.getGlobal().info("Received %s packet(s)".formatted(messageList.size()));
+        LatteLogger.get().info("Received %s packet(s)".formatted(messageList.size()));
         return messageList;
     }
 
@@ -66,7 +70,7 @@ public class RelayGateway {
             assert msg != null;
             final var packet = Packet.parse(msg.message());
             final var clientData = clientList.pop();
-            Logger.getGlobal().info("Opening Socket to client %s:%s".formatted(clientData.host(), clientData.port()));
+            LatteLogger.get().debug("Opening Socket to client %s:%s".formatted(clientData.host(), clientData.port()));
             try (final var outgoingSocket = new Socket(clientData.host(), clientData.port())) {
                 try (final var os = outgoingSocket.getOutputStream()) {
                     os.write(packet.toBytes());

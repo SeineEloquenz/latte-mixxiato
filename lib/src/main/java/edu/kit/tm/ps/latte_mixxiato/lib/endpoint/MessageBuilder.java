@@ -9,35 +9,47 @@ import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
 
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 public class MessageBuilder extends Endpoint {
 
+    private static final int DEST_LENGTH = Long.BYTES;
+
     private final BucketIdGenerator idGenerator;
+
 
     public MessageBuilder(final BucketIdGenerator idGenerator, final Gateway gateway, final Relay relay, final DeadDrop deadDrop, final SphinxClient client) {
         super(gateway, relay, deadDrop, client);
         this.idGenerator = idGenerator;
     }
 
-    public List<SphinxPacket> splitIntoSphinxPackets(InwardMessage message) throws SphinxException {
+    public List<Packet> splitIntoPackets(InwardMessage message) throws SphinxException {
         final var messageId = UUID.randomUUID();
-        byte[] dest = SerializationUtils.encodeLong(UUID.randomUUID().getMostSignificantBits());
 
-        final var packetPayloadSize = client.getMaxPayloadSize() - dest.length - Packet.HEADER_SIZE;
+        final var packetPayloadSize = client.getMaxPayloadSize() - DEST_LENGTH - Packet.HEADER_SIZE;
         final var packetsInMessage = (int) Math.ceil((double) message.message().length / packetPayloadSize);
-        final var sphinxPackets = new LinkedList<SphinxPacket>();
+        final var packets = new LinkedList<Packet>();
 
         for (int i = 0; i < packetsInMessage; i++) {
             final var bucketId = idGenerator.next();
             byte[] packetPayload = copyUpToNum(message.message(), packetPayloadSize * i, packetPayloadSize);
             final var packet = new Packet(messageId, bucketId, packetsInMessage, i, packetPayload);
 
-            sphinxPackets.add(createSphinxPacket(dest, packet.toBytes(), inboundRoutingInformation()));
+            packets.add(packet);
         }
 
-        return sphinxPackets;
+        return packets;
+    }
+
+    public Packet makeNoisePacket() {
+        return new Packet(UUID.randomUUID(), idGenerator.next(), 1, 0, "<empty>".getBytes(StandardCharsets.UTF_8));
+    }
+
+    public SphinxPacket makeOnion(Packet packet) throws SphinxException {
+        byte[] dest = SerializationUtils.encodeLong(UUID.randomUUID().getMostSignificantBits());
+        return createSphinxPacket(dest, packet.toBytes(), inboundRoutingInformation());
     }
 }

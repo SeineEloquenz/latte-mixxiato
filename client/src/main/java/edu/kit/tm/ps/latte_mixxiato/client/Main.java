@@ -9,6 +9,7 @@ import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.MessageBuilder;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Receiver;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Sender;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.FixedRoundProvider;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
@@ -25,7 +26,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         if (args.length < ARGS_LENGTH) {
-            Logger.getGlobal().severe("You need to pass the conversation partners seed.");
+            LatteLogger.get().error("You need to pass the conversation partners seed.");
             System.exit(1);
         }
         final var seed = Long.parseLong(args[0]);
@@ -55,14 +56,14 @@ public class Main {
         });
 
         final var scanner = new Scanner(System.in);
-        Logger.getGlobal().info("Sending messages from cli...");
+        LatteLogger.get().info("Sending messages from cli...");
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         messages.forEach(msg -> enqueue(client, msg));
-        Logger.getGlobal().info("Type your messages and confirm with enter. Entering :q will quit.");
+        System.out.println("Type your messages and confirm with enter. Entering :q will quit.");
         while (scanner.hasNext()) {
             final var line = scanner.nextLine();
             if (":q".equals(line)) {
@@ -70,11 +71,11 @@ public class Main {
             }
             enqueue(client, line);
         }
-        Logger.getGlobal().info("Goodbye.");
+        System.out.println("Goodbye.");
     }
 
     private static void enqueue(Client client, String message) {
-        Logger.getGlobal().info("Enqueueing message %s".formatted(message));
+        LatteLogger.get().info("Enqueueing message %s".formatted(message));
         try {
             client.sendMessage(message);
         } catch (SphinxException e) {

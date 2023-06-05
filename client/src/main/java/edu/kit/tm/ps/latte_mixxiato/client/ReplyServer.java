@@ -5,6 +5,7 @@ import com.robertsoultanaev.javasphinx.packet.message.DestinationAndMessage;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Packet;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Receiver;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -25,32 +26,22 @@ public class ReplyServer {
 
     public void listen() throws IOException {
         try (final var serverSocket = new ServerSocket(port)) {
-            Logger.getGlobal().info("Opened socket on port %s".formatted(port));
+            LatteLogger.get().debug("Opened socket on port %s".formatted(port));
             while (true) {
                 try(final var socket = serverSocket.accept()) {
-                    Logger.getGlobal().info("Accepted Socket connection.");
-                    final var packetList = this.handleConnection(socket);
-                    this.handle(packetList);
+                    LatteLogger.get().debug("Accepted Socket connection.");
+                    final var packet = this.handleConnection(socket);
+                    receiver.receive(packet);
                 }
             }
         }
     }
 
-    private List<Packet> handleConnection(Socket socket) throws IOException {
-        final LinkedList<Packet> messageList = new LinkedList<>();
+    private Packet handleConnection(Socket socket) throws IOException {
         try (final var is = socket.getInputStream()) {
-            do {
-                final var packetBytes = is.readAllBytes();
-                messageList.add(Packet.parse(packetBytes));
-            } while (is.available() > 0);
-        }
-        Logger.getGlobal().info("Received %s packet(s)".formatted(messageList.size()));
-        return messageList;
-    }
-
-    private void handle(List<Packet> packets) {
-        for (final var packet : packets) {
-            receiver.receive(packet);
+            final var packetBytes = is.readAllBytes();
+            LatteLogger.get().info("Received packet.");
+            return Packet.parse(packetBytes);
         }
     }
 }

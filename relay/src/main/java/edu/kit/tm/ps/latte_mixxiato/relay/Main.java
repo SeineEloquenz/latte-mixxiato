@@ -3,6 +3,7 @@ package edu.kit.tm.ps.latte_mixxiato.relay;
 import com.robertsoultanaev.javasphinx.SphinxException;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
@@ -14,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 3) {
-            Logger.getGlobal().severe("You need to pass the hostname, gateway port and dead drop port the server is listening on");
+            LatteLogger.get().error("You need to pass the hostname, gateway port and dead drop port the server is listening on");
             System.exit(1);
         }
         final var hostname = args[0];

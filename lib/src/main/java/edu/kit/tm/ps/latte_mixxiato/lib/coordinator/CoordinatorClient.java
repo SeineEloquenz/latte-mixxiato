@@ -1,6 +1,7 @@
 package edu.kit.tm.ps.latte_mixxiato.lib.coordinator;
 
 import com.google.gson.JsonParser;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
@@ -73,7 +74,7 @@ public class CoordinatorClient {
             if (!response.isSuccessful()) {
                 throw new IOException("Registration was unsuccessful. Error code %s".formatted(response.code()));
             }
-            Logger.getGlobal().info("Registered with coordinator");
+            LatteLogger.get().info("Registered with coordinator");
         }
     }
 
@@ -86,7 +87,7 @@ public class CoordinatorClient {
             if (!response.isSuccessful()) {
                 throw new IOException("Registration was unsuccessful. Error code %s".formatted(response.code()));
             }
-            Logger.getGlobal().info("Registered with coordinator");
+            LatteLogger.get().info("Registered with coordinator");
         }
     }
 
@@ -100,7 +101,7 @@ public class CoordinatorClient {
                 throw new IOException("Registration was unsuccessful. Error code %s".formatted(response.code()));
             }
         }
-        Logger.getGlobal().info("Registered with coordinator");
+        LatteLogger.get().info("Registered with coordinator");
     }
 
     public void waitUntilReady() throws IOException {
@@ -112,7 +113,7 @@ public class CoordinatorClient {
                 throw new RuntimeException(e);
             }
         }
-        Logger.getGlobal().info("Coordinator is ready.");
+        LatteLogger.get().info("Coordinator is ready.");
     }
 
     private boolean ready() throws IOException {

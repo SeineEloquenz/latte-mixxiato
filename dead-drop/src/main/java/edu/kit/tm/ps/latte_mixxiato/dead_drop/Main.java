@@ -5,6 +5,7 @@ import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.ReplyBuilder;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
@@ -15,7 +16,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException, SphinxException {
         if (args.length != 2) {
-            Logger.getGlobal().severe("You need to pass the hostname and gatewayPort the server is listening on");
+            LatteLogger.get().error("You need to pass the hostname and gatewayPort the server is listening on");
             System.exit(1);
         }
         final var hostname = args[0];
@@ -30,7 +31,6 @@ public class Main {
         final var deadDrop = new DeadDrop(hostname, port, keyPair.pub());
 
         coordinatorClient.register(deadDrop);
-        Logger.getGlobal().info("Registered with coordinator");
 
         coordinatorClient.waitUntilReady();
 

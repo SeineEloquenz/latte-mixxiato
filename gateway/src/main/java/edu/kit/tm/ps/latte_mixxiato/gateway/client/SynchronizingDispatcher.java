@@ -6,6 +6,7 @@ import com.robertsoultanaev.javasphinx.packet.ProcessedPacket;
 import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientData;
 import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientList;
 import edu.kit.tm.ps.latte_mixxiato.gateway.routing.PacketWithSender;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.RoundProvider;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
 
@@ -30,7 +31,8 @@ public class SynchronizingDispatcher {
         this.dispatchService.scheduleAtFixedRate(
                 () -> {
                     clientList.clear();
-                    Logger.getGlobal().info("Reached round end, dispatching %s message(s) now.".formatted(packets.size()));
+                    LatteLogger.get().info("Reached round end, sending %s message(s) to %s:%s."
+                            .formatted(packets.size(), relay.host(), relay.gatewayPort()));
                     try (final var socket = new Socket(relay.host(), relay.gatewayPort())) {
                         try (final var os = socket.getOutputStream()) {
                             for (final var packetWithSender : packets) {
@@ -51,6 +53,6 @@ public class SynchronizingDispatcher {
 
     public void dispatch(ClientData clientData, ProcessedPacket packet) {
         packets.add(new PacketWithSender(clientData, node.repack(packet)));
-        Logger.getGlobal().info("Enqueued packet for current round.");
+        LatteLogger.get().debug("Enqueued packet for current round.");
     }
 }

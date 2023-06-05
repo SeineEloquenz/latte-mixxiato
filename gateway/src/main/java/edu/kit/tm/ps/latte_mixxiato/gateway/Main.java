@@ -6,6 +6,7 @@ import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientList;
 import edu.kit.tm.ps.latte_mixxiato.gateway.relay.RelayGateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.FixedRoundProvider;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
@@ -18,7 +19,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 3) {
-            Logger.getGlobal().severe("You need to pass the hostname, client and relay port the server is listening on");
+            LatteLogger.get().error("You need to pass the hostname, client and relay port the server is listening on");
             System.exit(1);
         }
         final var host = args[0];

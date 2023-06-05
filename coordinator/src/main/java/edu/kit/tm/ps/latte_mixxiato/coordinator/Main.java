@@ -2,6 +2,7 @@ package edu.kit.tm.ps.latte_mixxiato.coordinator;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.DeadDrop;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Gateway;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.mix.Relay;
@@ -33,7 +34,7 @@ public class Main {
             final var reqJson = JsonParser.parseString(req.body()).getAsJsonObject();
             final var gateway = Gateway.fromJson(reqJson);
             coordinator.register(gateway);
-            Logger.getGlobal().info("Registered gateway");
+            LatteLogger.get().info("Registered gateway");
             return new JsonObject();
         });
         Spark.post("/api/relay/register", (req, res) -> {
@@ -44,7 +45,7 @@ public class Main {
             final var reqJson = JsonParser.parseString(req.body()).getAsJsonObject();
             final var gateway = Relay.fromJson(reqJson);
             coordinator.register(gateway);
-            Logger.getGlobal().info("Registered gateway");
+            LatteLogger.get().info("Registered relay");
             return new JsonObject();
         });
         Spark.post("/api/deadDrop/register", (req, res) -> {
@@ -55,9 +56,9 @@ public class Main {
             final var reqJson = JsonParser.parseString(req.body()).getAsJsonObject();
             final var gateway = DeadDrop.fromJson(reqJson);
             coordinator.register(gateway);
-            Logger.getGlobal().info("Registered gateway");
+            LatteLogger.get().info("Registered deadDrop");
             return new JsonObject();
         });
-        Logger.getGlobal().info("Listening for requests...");
+        LatteLogger.get().info("Listening for requests...");
     }
 }

@@ -4,16 +4,15 @@ import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.message.DestinationAndMessage;
-import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Endpoint;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Packet;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.ReplyBuilder;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class DeadDropServer {
 
@@ -35,14 +34,14 @@ public class DeadDropServer {
 
     public void listen() throws IOException, SphinxException {
         try (final var serverSocket = new ServerSocket(myPort)) {
-            Logger.getGlobal().info("Opened socket on port %s".formatted(myPort));
+            LatteLogger.get().debug("Opened socket on port %s".formatted(myPort));
             while (true) {
                 try(final var socket = serverSocket.accept()) {
-                    Logger.getGlobal().info("Accepted Socket connection.");
+                    LatteLogger.get().debug("Accepted Socket connection.");
                     final var packetList = this.handleConnection(socket);
                     this.handle(packetList);
                 }
-                Logger.getGlobal().info("Sending %s reply(s) to %s:%s".formatted(store.size(), targetHost, targetPort));
+                LatteLogger.get().info("Sending %s reply(s) to %s:%s".formatted(store.size(), targetHost, targetPort));
                 try (final var outgoingSocket = new Socket(targetHost, targetPort)) {
                     try (final var os = outgoingSocket.getOutputStream()) {
                         while (!store.isEmpty()) {
@@ -52,7 +51,7 @@ public class DeadDropServer {
                         }
                     }
                 }
-                Logger.getGlobal().info("Sent reply(s)");
+                LatteLogger.get().debug("Sent reply(s)");
             }
         }
     }
@@ -62,6 +61,9 @@ public class DeadDropServer {
         try (final var is = socket.getInputStream()) {
             do {
                 final var packetBytes = is.readNBytes(1254);
+                if (packetBytes.length == 0) {
+                    break;
+                }
                 final var processedPacket = node.sphinxProcess(node.client().unpackMessage(packetBytes).packetContent());
                 final var flag = processedPacket.routingFlag();
                 if (flag.equals(RoutingFlag.DESTINATION)) {
@@ -69,11 +71,11 @@ public class DeadDropServer {
                             .receiveForward(processedPacket.macKey(), processedPacket.packetContent().delta());
                     messageList.add(destinationAndMessage);
                 } else {
-                    Logger.getGlobal().warning("Received packet with wrong flag %s".formatted(flag));
+                    LatteLogger.get().warn("Received packet with wrong flag %s".formatted(flag));
                 }
-            } while (is.available() > 0);
+            } while (true);
         }
-        Logger.getGlobal().info("Received %s packet(s)".formatted(messageList.size()));
+        LatteLogger.get().info("Received %s packet(s)".formatted(messageList.size()));
         return messageList;
     }
 
