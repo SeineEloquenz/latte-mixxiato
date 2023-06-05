@@ -1,54 +1,68 @@
 package edu.kit.tm.ps.latte_mixxiato.lib.endpoint;
 
 import com.robertsoultanaev.javasphinx.SphinxClient;
+import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.packet.UnaddressedPacket;
+import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.RoundProvider;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNode;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.OutwardMessage;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Gateway;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.InwardMessage;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 public class Sender {
 
-    private final Endpoint endpoint;
-    private final SphinxClient client;
-    private final Queue<Map.Entry<SphinxPacket, MixNode>> packetQueue;
-    private final ScheduledExecutorService service;
+    private final Gateway gateway;
+    private final MessageBuilder messageBuilder;
+    private final Queue<UnaddressedPacket> packetQueue;
+    private final BucketIdGenerator idGenerator;
 
-    public Sender(final Endpoint endpoint, final SphinxClient client, final RoundProvider provider) {
-        this.endpoint = endpoint;
-        this.client = client;
+    public Sender(final Gateway gateway, final MessageBuilder messageBuilder, final SphinxClient client, final RoundProvider provider, final BucketIdGenerator idGenerator) {
+        this.gateway = gateway;
+        this.messageBuilder = messageBuilder;
+        this.idGenerator = idGenerator;
         this.packetQueue = new LinkedList<>();
-        this.service = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         service.scheduleAtFixedRate(
-                () -> {
-                    Logger.getGlobal().info("Reached round end, sending message.");
-                    Optional.ofNullable(packetQueue.peek()).ifPresent(entry -> {
-                        try {
-                            entry.getValue().send(client, entry.getKey());
-                            packetQueue.poll();
-                        } catch (IOException e) {
-                            Logger.getGlobal().warning("Failed to send packet Trying again in next round. Stacktrace: ");
-                            e.printStackTrace();
-                        }
-                    });
-                },
+                () -> Optional.ofNullable(packetQueue.peek())
+                        .or(() -> Optional.ofNullable(messageBuilder.makeNoisePacket()))
+                        .map(unaddressedPacket -> unaddressedPacket.address(this.idGenerator.next()))
+                        .ifPresent(packet -> {
+                            try {
+                                LatteLogger.get().info("Reached round end, sending packet(bucket=%s,pim=%s,seq=%s)."
+                                        .formatted(packet.bucketId(), packet.packetsInMessage(), packet.sequenceNumber()));
+                                this.send(client, messageBuilder.makeOnion(packet));
+                                packetQueue.poll();
+                            } catch (IOException e) {
+                                LatteLogger.get().warn("Failed to send packet Trying again in next round. Stacktrace: ");
+                                e.printStackTrace();
+                            } catch (SphinxException e) {
+                                LatteLogger.get().warn("Got SphinxException when packing packet. Stacktrace: ");
+                                e.printStackTrace();
+                            }
+                        }),
                 provider.timeUntilRoundEnd().time(),
                 10 * 1000,
                 TimeUnit.MILLISECONDS);
     }
 
-    public void enqueueToSend(OutwardMessage message) {
-        final var packets = endpoint.splitIntoSphinxPackets(message);
-        packetQueue.addAll(packets.entrySet());
+    public void enqueueToSend(InwardMessage message) throws SphinxException {
+        final var packets = messageBuilder.splitIntoPackets(message);
+        packetQueue.addAll(packets);
+    }
+
+    private void send(SphinxClient client, SphinxPacket packet) throws IOException, SphinxException {
+        try (final var socket = new Socket(gateway.host(), gateway.clientPort())) {
+            final var os = socket.getOutputStream();
+            os.write(client.packMessage(packet));
+        }
     }
 }

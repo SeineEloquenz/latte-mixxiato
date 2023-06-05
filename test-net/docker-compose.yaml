@@ -5,8 +5,8 @@ services:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-coordinator:latest
     networks:
     - mixnet
-  mixa:
-    image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
+  gateway:
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-gateway:latest
     ports:
     - "8888:8888"
     networks:
@@ -15,25 +15,16 @@ services:
     - ./coord.json:/opt/app/coord.json
     depends_on:
     - coordinator
-    command: "mixa"
-  mixb:
-    image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
+    command: "gateway 8000 8001"
+  relay:
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-relay:latest
     networks:
     - mixnet
     volumes:
     - ./coord.json:/opt/app/coord.json
     depends_on:
     - coordinator
-    command: "mixb"
-  mixc:
-    image: registry.mixlab.mondcarion.group/latte-mixxiato-mix:latest
-    networks:
-    - mixnet
-    volumes:
-    - ./coord.json:/opt/app/coord.json
-    depends_on:
-    - coordinator
-    command: "mixc"
+    command: "relay 8001 8002"
   dead-drop:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-dead-drop:latest
     networks:
@@ -42,18 +33,56 @@ services:
     - ./coord.json:/opt/app/coord.json
     depends_on:
     - coordinator
-  client:
+    command: "dead-drop 8003"
+  client1:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
     networks:
     - mixnet
     volumes:
     - ./coord.json:/opt/app/coord.json
-    command: "dead-drop 8888 hello this is obi wan"
+    command: "1111 i have the high ground!"
     depends_on:
     - coordinator
-    - mixa
-    - mixb
-    - mixc
+    - gateway
+    - relay
+    - dead-drop
+  client2:
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
+    networks:
+      - mixnet
+    volumes:
+      - ./coord.json:/opt/app/coord.json
+    command: "1111"
+    depends_on:
+      - coordinator
+      - gateway
+      - relay
+      - dead-drop
+  client3:
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
+    networks:
+      - mixnet
+    volumes:
+      - ./coord.json:/opt/app/coord.json
+    command: "2000"
+    depends_on:
+      - coordinator
+      - gateway
+      - relay
+      - dead-drop
+  interactive-client:
+    image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
+    networks:
+      - mixnet
+    volumes:
+      - ./coord.json:/opt/app/coord.json
+      - ./interactive-client/run.sh:/opt/app/run.sh
+    entrypoint: /bin/sh
+    depends_on:
+      - coordinator
+      - gateway
+      - relay
+      - dead-drop
 
 networks:
   mixnet:

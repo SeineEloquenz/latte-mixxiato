@@ -1,28 +1,48 @@
 package edu.kit.tm.ps.latte_mixxiato.coordinator;
 
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.InMemoryMixNodeRepository;
-import edu.kit.tm.ps.latte_mixxiato.lib.routing.MixNode;
-import org.bouncycastle.math.ec.ECPoint;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.DeadDrop;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Gateway;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Relay;
 
-import java.util.Set;
+import java.util.Optional;
 
 public class Coordinator {
 
-    private final InMemoryMixNodeRepository mixNodeRepository;
+    private Gateway gateway;
+    private Relay relay;
+    private DeadDrop deadDrop;
 
     public Coordinator() {
-        this.mixNodeRepository = new InMemoryMixNodeRepository();
+        this.gateway = null;
+        this.relay = null;
+        this.deadDrop = null;
     }
 
-    public Set<MixNode> all() {
-        return mixNodeRepository.all();
+    public void register(Gateway gateway) {
+        this.gateway = gateway;
     }
-    public synchronized MixNode register(String host, int port, ECPoint pubKey) throws MixSetFullException {
-        if (mixNodeRepository.size() >= 3) {
-            throw new MixSetFullException();
-        }
-        final var mix = new MixNode(mixNodeRepository.size(), host, port, pubKey);
-        mixNodeRepository.put(mix);
-        return mix;
+
+    public void register(Relay relay) {
+        this.relay = relay;
+    }
+
+    public void register(DeadDrop deadDrop) {
+        this.deadDrop = deadDrop;
+    }
+
+    public boolean ready() {
+        return gateway != null && relay != null && deadDrop != null;
+    }
+
+    public Optional<Gateway> gateway() {
+        return Optional.ofNullable(gateway);
+    }
+
+    public Optional<Relay> relay() {
+        return Optional.ofNullable(relay);
+    }
+
+    public Optional<DeadDrop> deadDrop() {
+        return Optional.ofNullable(deadDrop);
     }
 }

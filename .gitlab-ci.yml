@@ -31,9 +31,10 @@ build:jdk17:
       - "target/"
       - "client/target/"
       - "coordinator/target/"
-      - "dead-drop/target/"
       - "lib/target/"
-      - "mix/target/"
+      - "gateway/target/"
+      - "relay/target/"
+      - "dead-drop/target/"
     expire_in: "30 days"
 
 containers:jdk17:
