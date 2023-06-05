@@ -14,3 +14,10 @@ Run `docker compose up`
 
 ### Locally built images
 Run `run-locally.sh`
+
+#### Use an interactive client
+Run `run-locally.sh`
+
+In a second shell:
+1. Do `sh interactive-client/enter.sh`
+2. Do `./run.sh`
