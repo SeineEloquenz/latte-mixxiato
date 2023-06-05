@@ -37,6 +37,7 @@ public class SynchronizingDispatcher {
                             for (final var packetWithSender : packets) {
                                 final var packedMessage = node.client().packMessage(packetWithSender.packet());
                                 os.write(packedMessage);
+                                LatteLogger.get().debug("Wrote %s bytes".formatted(packedMessage.length));
                                 clientList.record(packetWithSender.clientData());
                             }
                         }
@@ -50,7 +51,7 @@ public class SynchronizingDispatcher {
                 TimeUnit.MILLISECONDS);
     }
 
-    public void dispatch(ClientData clientData, ProcessedPacket packet) {
+    public synchronized void dispatch(ClientData clientData, ProcessedPacket packet) {
         packets.add(new PacketWithSender(clientData, node.repack(packet)));
         LatteLogger.get().debug("Enqueued packet for current round.");
     }
