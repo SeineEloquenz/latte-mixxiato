@@ -18,7 +18,7 @@ public class BucketIdGenerator {
 
     public UUID next() {
         final var nextSeed = seed + roundProvider.nextRoundEnd().toEpochMilli();
-        LatteLogger.get().info(String.valueOf(nextSeed));
+        LatteLogger.get().debug("Next seed is: %s".formatted(nextSeed));
         final var currentRandom = new Random(nextSeed);
         final var high = currentRandom.nextLong();
         final var low = currentRandom.nextLong();
