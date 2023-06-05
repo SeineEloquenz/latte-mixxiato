@@ -60,7 +60,7 @@ public class DeadDropServer {
         final var messageList = new LinkedList<DestinationAndMessage>();
         try (final var is = socket.getInputStream()) {
             do {
-                final var packetBytes = is.readNBytes(1254);
+                final var packetBytes = is.readNBytes(node.client().params().packedPacketLength());
                 if (packetBytes.length == 0) {
                     break;
                 }
