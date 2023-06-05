@@ -31,8 +31,6 @@ public class Main {
 
         final var coordinatorClient = new CoordinatorClient(CoordinatorConfig.load());
 
-        final var messages = Arrays.stream(args).skip(ARGS_LENGTH).toList();
-
         final var sphinxFactory = new DefaultSphinxFactory(); //TODO configure or get from coordinator
         coordinatorClient.waitUntilReady();
 
@@ -55,16 +53,21 @@ public class Main {
                 e.printStackTrace();
             }
         });
-
-        LatteLogger.get().info("Sending messages from cli...");
-        messages.forEach(msg -> enqueue(client, msg));
-
-        handleCli(client);
+        handleArgs(client, args);
+        handleUserInput(client);
 
         System.out.println("Goodbye.");
     }
 
-    private static void handleCli(Client client) {
+    private static void handleArgs(Client client, String[] args) {
+        final var messages = Arrays.stream(args).skip(ARGS_LENGTH).toList();
+        if (messages.size() > 0) {
+            LatteLogger.get().info("Sending messages from cli...");
+            messages.forEach(msg -> enqueue(client, msg));
+        }
+    }
+
+    private static void handleUserInput(Client client) {
         final var scanner = new Scanner(System.in);
         System.out.println("Type your messages and confirm with enter. Entering :q will quit.");
         while (scanner.hasNext()) {
