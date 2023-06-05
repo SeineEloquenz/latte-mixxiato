@@ -71,6 +71,7 @@ public class RelayGateway {
         for (final var msg : messages) {
             final var packet = Packet.parse(msg.message());
             final var clientData = clientList.get(0);
+            clientList.remove(0);
             LatteLogger.get().debug("Opening Socket to client %s:%s".formatted(clientData.host(), clientData.port()));
             try (final var outgoingSocket = new Socket(clientData.host(), clientData.port())) {
                 try (final var os = outgoingSocket.getOutputStream()) {
