@@ -11,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 public class RelayServer {
 
@@ -18,12 +19,14 @@ public class RelayServer {
     private final String targetHost;
     private final int targetPort;
     private final SphinxNode node;
+    private Function<List<SphinxPacket>, List<SphinxPacket>> reorderer;
 
-    public RelayServer(final int myPort, final String targetHost, final int targetPort, final SphinxNode node) {
+    public RelayServer(final int myPort, final String targetHost, final int targetPort, final SphinxNode node, final Function<List<SphinxPacket>, List<SphinxPacket>> reorderer) {
         this.myPort = myPort;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
         this.node = node;
+        this.reorderer = reorderer;
     }
 
     public void listen() throws IOException, SphinxException {
@@ -57,7 +60,9 @@ public class RelayServer {
             } while (true);
         }
         LatteLogger.get().info("Received %s packet(s)".formatted(packetList.size()));
-        return packetList;
+        final var reordered = reorderer.apply(packetList);
+        LatteLogger.get().debug("Reordered packets");
+        return reordered;
     }
 
     public void send(List<SphinxPacket> packets) throws IOException, SphinxException {

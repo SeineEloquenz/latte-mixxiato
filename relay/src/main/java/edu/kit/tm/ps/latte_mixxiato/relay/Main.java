@@ -4,6 +4,7 @@ import com.robertsoultanaev.javasphinx.SphinxException;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
+import edu.kit.tm.ps.latte_mixxiato.lib.routing.Permuter;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Relay;
 import edu.kit.tm.ps.latte_mixxiato.lib.sphinx.DefaultSphinxFactory;
 
@@ -34,8 +35,11 @@ public class Main {
 
         final var gateway = coordinatorClient.gateway();
         final var deadDrop = coordinatorClient.deadDrop();
-        final var gatewayRelay = new RelayServer(gatewayPort, deadDrop.host(), deadDrop.relayPort(), sphinxNode);
-        final var deadDropRelay = new RelayServer(deadDropPort, gateway.host(), gateway.relayPort(), sphinxNode);
+
+        final var permuter = new Permuter();
+
+        final var gatewayRelay = new RelayServer(gatewayPort, deadDrop.host(), deadDrop.relayPort(), sphinxNode, permuter::permute);
+        final var deadDropRelay = new RelayServer(deadDropPort, gateway.host(), gateway.relayPort(), sphinxNode, permuter::restoreOrder);
         final var executor = Executors.newFixedThreadPool(2);
         executor.submit(() -> {
             try {
