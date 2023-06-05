@@ -4,8 +4,8 @@ import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.message.DestinationAndMessage;
-import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Packet;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.ReplyBuilder;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.packet.Packet;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 
 import java.io.IOException;

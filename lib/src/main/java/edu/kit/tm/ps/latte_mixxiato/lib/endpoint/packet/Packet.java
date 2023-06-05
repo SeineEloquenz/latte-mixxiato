@@ -1,4 +1,4 @@
-package edu.kit.tm.ps.latte_mixxiato.lib.endpoint;
+package edu.kit.tm.ps.latte_mixxiato.lib.endpoint.packet;
 
 import com.robertsoultanaev.javasphinx.SerializationUtils;
 

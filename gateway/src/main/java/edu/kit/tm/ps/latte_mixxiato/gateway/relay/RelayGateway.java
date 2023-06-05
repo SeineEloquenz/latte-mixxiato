@@ -5,7 +5,7 @@ import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.message.DestinationAndMessage;
 import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientData;
-import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Packet;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.packet.Packet;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Permuter;
 

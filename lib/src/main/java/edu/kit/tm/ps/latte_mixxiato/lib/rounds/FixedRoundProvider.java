@@ -21,7 +21,8 @@ public class FixedRoundProvider implements RoundProvider {
         return new RoundInfo(roundEnd.toEpochMilli() - currentTime.toEpochMilli(), TimeUnit.MILLISECONDS);
     }
 
-    private Instant nextRoundEnd() {
+    @Override
+    public Instant nextRoundEnd() {
         return Instant.now().truncatedTo(ChronoUnit.MINUTES).plus(offsetTime, offsetUnit);
     }
 }

@@ -3,6 +3,7 @@ package edu.kit.tm.ps.latte_mixxiato.lib.endpoint;
 import com.robertsoultanaev.javasphinx.SphinxClient;
 import com.robertsoultanaev.javasphinx.SphinxException;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.packet.UnaddressedPacket;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import edu.kit.tm.ps.latte_mixxiato.lib.rounds.RoundProvider;
 import edu.kit.tm.ps.latte_mixxiato.lib.routing.Gateway;
@@ -21,16 +22,19 @@ public class Sender {
 
     private final Gateway gateway;
     private final MessageBuilder messageBuilder;
-    private final Queue<Packet> packetQueue;
+    private final Queue<UnaddressedPacket> packetQueue;
+    private final BucketIdGenerator idGenerator;
 
-    public Sender(final Gateway gateway, final MessageBuilder messageBuilder, final SphinxClient client, final RoundProvider provider) {
+    public Sender(final Gateway gateway, final MessageBuilder messageBuilder, final SphinxClient client, final RoundProvider provider, final BucketIdGenerator idGenerator) {
         this.gateway = gateway;
         this.messageBuilder = messageBuilder;
+        this.idGenerator = idGenerator;
         this.packetQueue = new LinkedList<>();
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         service.scheduleAtFixedRate(
                 () -> Optional.ofNullable(packetQueue.peek())
                         .or(() -> Optional.ofNullable(messageBuilder.makeNoisePacket()))
+                        .map(unaddressedPacket -> unaddressedPacket.address(this.idGenerator.next()))
                         .ifPresent(packet -> {
                             try {
                                 LatteLogger.get().info("Reached round end, sending packet(bucket=%s,pim=%s,seq=%s)."

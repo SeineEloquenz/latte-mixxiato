@@ -38,8 +38,11 @@ public class Main {
 
         final var gateway = coordinatorClient.gateway();
 
-        final var endpoint = new MessageBuilder(new BucketIdGenerator(seed), gateway, coordinatorClient.relay(), coordinatorClient.deadDrop(), sphinxFactory.client());
-        final var sender = new Sender(gateway, endpoint, sphinxFactory.client(), new FixedRoundProvider(55, ChronoUnit.SECONDS));
+        final var roundProvider = new FixedRoundProvider(55, ChronoUnit.SECONDS);
+        final var idGenerator = new BucketIdGenerator(seed, roundProvider);
+
+        final var endpoint = new MessageBuilder(gateway, coordinatorClient.relay(), coordinatorClient.deadDrop(), sphinxFactory.client());
+        final var sender = new Sender(gateway, endpoint, sphinxFactory.client(), roundProvider, idGenerator);
         final var receiver = new Receiver(assembledMessage -> System.out.println(assembledMessage.messageContent()));
 
         final var replyServer = new ReplyServer(ClientInfo.PORT, receiver);

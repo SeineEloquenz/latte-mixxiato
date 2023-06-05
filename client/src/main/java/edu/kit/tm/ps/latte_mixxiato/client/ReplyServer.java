@@ -1,7 +1,7 @@
 package edu.kit.tm.ps.latte_mixxiato.client;
 
-import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Packet;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.Receiver;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.packet.Packet;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 
 import java.io.IOException;

@@ -1,6 +1,7 @@
 package edu.kit.tm.ps.latte_mixxiato.lib.endpoint;
 
 import com.robertsoultanaev.javasphinx.SerializationUtils;
+import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.packet.Packet;
 
 import java.util.Collections;
 import java.util.Comparator;
