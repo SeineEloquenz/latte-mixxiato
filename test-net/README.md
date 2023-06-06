@@ -21,3 +21,6 @@ Run `run-locally.sh`
 In a second shell:
 1. Do `sh interactive-client/enter.sh`
 2. Do `./run.sh`
+
+### Run with more clients
+You can generate a docker compose file with more client containers by running `generate-docker-compose.sh <#client>`
