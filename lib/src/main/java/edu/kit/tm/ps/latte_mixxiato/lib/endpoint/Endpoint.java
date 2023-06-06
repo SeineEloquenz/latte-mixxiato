@@ -30,13 +30,13 @@ public abstract class Endpoint {
         return client.createPacket(packetContent);
     }
 
-    protected RoutingInformation inboundRoutingInformation() throws SphinxException {
+    protected RoutingInformation inboundRoutingInformation(int replyPort) throws SphinxException {
         final byte[][] nodesRouting = new byte[3][];
         final ECPoint[] nodeKeys = new ECPoint[3];
 
         nodesRouting[0] = client.encodeNode(0, 0);
         nodeKeys[0] = gateway.publicKey();
-        nodesRouting[1] = client.encodeNode(1, 0);
+        nodesRouting[1] = client.encodeNode(1, replyPort);
         nodeKeys[1] = relay.publicKey();
         nodesRouting[2] = client.encodeNode(2, 0);
         nodeKeys[2] = deadDrop.publicKey();

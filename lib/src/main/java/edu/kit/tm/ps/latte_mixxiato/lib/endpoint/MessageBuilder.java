@@ -20,9 +20,12 @@ public class MessageBuilder extends Endpoint {
 
     private static final int DEST_LENGTH = Long.BYTES;
 
+    private final int replyPort;
 
-    public MessageBuilder(final Gateway gateway, final Relay relay, final DeadDrop deadDrop, final SphinxClient client) {
+
+    public MessageBuilder(final Gateway gateway, final Relay relay, final DeadDrop deadDrop, final SphinxClient client, final int replyPort) {
         super(gateway, relay, deadDrop, client);
+        this.replyPort = replyPort;
     }
 
     public List<UnaddressedPacket> splitIntoPackets(InwardMessage message) throws SphinxException {
@@ -48,6 +51,6 @@ public class MessageBuilder extends Endpoint {
 
     public SphinxPacket makeOnion(Packet packet) throws SphinxException {
         byte[] dest = SerializationUtils.encodeLong(UUID.randomUUID().getMostSignificantBits());
-        return createSphinxPacket(dest, packet.toBytes(), inboundRoutingInformation());
+        return createSphinxPacket(dest, packet.toBytes(), inboundRoutingInformation(replyPort));
     }
 }

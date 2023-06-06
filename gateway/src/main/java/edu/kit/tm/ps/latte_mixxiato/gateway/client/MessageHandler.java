@@ -5,7 +5,6 @@ import com.robertsoultanaev.javasphinx.SphinxNode;
 import com.robertsoultanaev.javasphinx.packet.RoutingFlag;
 import com.robertsoultanaev.javasphinx.packet.SphinxPacket;
 import edu.kit.tm.ps.latte_mixxiato.gateway.routing.ClientData;
-import edu.kit.tm.ps.latte_mixxiato.lib.client.ClientInfo;
 import edu.kit.tm.ps.latte_mixxiato.lib.logging.LatteLogger;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -31,7 +30,8 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
         if (flag.equals(RoutingFlag.RELAY)) {
             final InetSocketAddress senderAddress = (InetSocketAddress) context.channel().remoteAddress();
-            dispatcher.dispatch(new ClientData(senderAddress.getHostString(), ClientInfo.PORT), processedPacket);
+            final var replyPort = processedPacket.relayInfo().additionalInfo();
+            dispatcher.dispatch(new ClientData(senderAddress.getHostString(), replyPort), processedPacket);
         } else {
             LatteLogger.get().warn("Found wrong flag %s".formatted(flag));
         }

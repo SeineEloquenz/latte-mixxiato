@@ -8,13 +8,15 @@ import java.nio.charset.StandardCharsets;
 
 public class Client {
 
+    private final int replyPort;
     private final Sender sender;
 
-    public Client(final Sender sender) {
+    public Client(final int replyPort, final Sender sender) {
+        this.replyPort = replyPort;
         this.sender = sender;
     }
 
     public void sendMessage(String message) throws SphinxException {
-        sender.enqueueToSend(new InwardMessage(message.getBytes(StandardCharsets.UTF_8)));
+        sender.enqueueToSend(new InwardMessage(replyPort, message.getBytes(StandardCharsets.UTF_8)));
     }
 }

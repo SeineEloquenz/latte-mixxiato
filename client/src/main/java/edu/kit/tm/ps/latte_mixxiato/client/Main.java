@@ -1,7 +1,6 @@
 package edu.kit.tm.ps.latte_mixxiato.client;
 
 import com.robertsoultanaev.javasphinx.SphinxException;
-import edu.kit.tm.ps.latte_mixxiato.lib.client.ClientInfo;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorClient;
 import edu.kit.tm.ps.latte_mixxiato.lib.coordinator.CoordinatorConfig;
 import edu.kit.tm.ps.latte_mixxiato.lib.endpoint.BucketIdGenerator;
@@ -20,14 +19,15 @@ import java.util.concurrent.Executors;
 
 public class Main {
 
-    private static final int ARGS_LENGTH = 1;
+    private static final int ARGS_LENGTH = 2;
 
     public static void main(String[] args) throws IOException {
         if (args.length < ARGS_LENGTH) {
-            LatteLogger.get().error("You need to pass the conversation partners seed.");
+            LatteLogger.get().error("You need to pass the port on which the client listens for replies and the conversation partners seed.");
             System.exit(1);
         }
-        final var seed = Long.parseLong(args[0]);
+        final var port = Integer.parseInt(args[0]);
+        final var seed = Long.parseLong(args[1]);
 
         final var coordinatorClient = new CoordinatorClient(CoordinatorConfig.load());
 
@@ -39,12 +39,12 @@ public class Main {
         final var roundProvider = new FixedRoundProvider(55, ChronoUnit.SECONDS);
         final var idGenerator = new BucketIdGenerator(seed, roundProvider);
 
-        final var endpoint = new MessageBuilder(gateway, coordinatorClient.relay(), coordinatorClient.deadDrop(), sphinxFactory.client());
+        final var endpoint = new MessageBuilder(gateway, coordinatorClient.relay(), coordinatorClient.deadDrop(), sphinxFactory.client(), port);
         final var sender = new Sender(gateway, endpoint, sphinxFactory.client(), roundProvider, idGenerator);
         final var receiver = new Receiver(assembledMessage -> System.out.println(assembledMessage.messageContent()));
 
-        final var replyServer = new ReplyServer(ClientInfo.PORT, receiver);
-        final var client = new Client(sender);
+        final var replyServer = new ReplyServer(port, receiver);
+        final var client = new Client(port, sender);
 
         Executors.newSingleThreadExecutor().submit(() -> {
             try {

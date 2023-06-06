@@ -40,7 +40,7 @@ services:
     - mixnet
     volumes:
     - ./coord.json:/opt/app/coord.json
-    command: "1111 i have the high ground!"
+    command: "9999 1111 i have the high ground!"
     depends_on:
     - coordinator
     - gateway
@@ -52,7 +52,7 @@ services:
       - mixnet
     volumes:
       - ./coord.json:/opt/app/coord.json
-    command: "1111"
+    command: "9999 1111 you underestimate my power!"
     depends_on:
       - coordinator
       - gateway
@@ -64,7 +64,7 @@ services:
       - mixnet
     volumes:
       - ./coord.json:/opt/app/coord.json
-    command: "2000"
+    command: "9999 2000 hello i am a test client i hope you can see all these messages. If so, then yay!"
     depends_on:
       - coordinator
       - gateway
