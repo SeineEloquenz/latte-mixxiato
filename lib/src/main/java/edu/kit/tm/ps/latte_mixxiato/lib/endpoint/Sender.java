@@ -23,35 +23,41 @@ public class Sender {
     private final Gateway gateway;
     private final MessageBuilder messageBuilder;
     private final Queue<UnaddressedPacket> packetQueue;
+    private final SphinxClient client;
     private final BucketIdGenerator idGenerator;
 
     public Sender(final Gateway gateway, final MessageBuilder messageBuilder, final SphinxClient client, final RoundProvider provider, final BucketIdGenerator idGenerator) {
         this.gateway = gateway;
         this.messageBuilder = messageBuilder;
+        this.client = client;
         this.idGenerator = idGenerator;
         this.packetQueue = new LinkedList<>();
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         service.scheduleAtFixedRate(
-                () -> Optional.ofNullable(packetQueue.peek())
-                        .or(() -> Optional.ofNullable(messageBuilder.makeNoisePacket()))
-                        .map(unaddressedPacket -> unaddressedPacket.address(this.idGenerator.next()))
-                        .ifPresent(packet -> {
-                            try {
-                                LatteLogger.get().info("Reached round end, sending packet(bucket=%s,pim=%s,seq=%s)."
-                                        .formatted(packet.bucketId(), packet.packetsInMessage(), packet.sequenceNumber()));
-                                this.send(client, messageBuilder.makeOnion(packet));
-                                packetQueue.poll();
-                            } catch (IOException e) {
-                                LatteLogger.get().warn("Failed to send packet Trying again in next round. Stacktrace: ");
-                                e.printStackTrace();
-                            } catch (SphinxException e) {
-                                LatteLogger.get().warn("Got SphinxException when packing packet. Stacktrace: ");
-                                e.printStackTrace();
-                            }
-                        }),
+                this::handleSend,
                 provider.timeUntilRoundEnd().time(),
                 10 * 1000,
                 TimeUnit.MILLISECONDS);
+    }
+
+    private void handleSend() {
+        Optional.ofNullable(packetQueue.peek())
+                .or(() -> Optional.ofNullable(messageBuilder.makeNoisePacket()))
+                .map(unaddressedPacket -> unaddressedPacket.address(this.idGenerator.next()))
+                .ifPresent(packet -> {
+                    try {
+                        LatteLogger.get().info("Reached round end, sending packet(bucket=%s,pim=%s,seq=%s)."
+                                .formatted(packet.bucketId(), packet.packetsInMessage(), packet.sequenceNumber()));
+                        this.send(client, messageBuilder.makeOnion(packet));
+                        packetQueue.poll();
+                    } catch (IOException e) {
+                        LatteLogger.get().warn("Failed to send packet Trying again in next round. Stacktrace: ");
+                        e.printStackTrace();
+                    } catch (SphinxException e) {
+                        LatteLogger.get().warn("Got SphinxException when packing packet. Stacktrace: ");
+                        e.printStackTrace();
+                    }
+                });
     }
 
     public void enqueueToSend(InwardMessage message) throws SphinxException {
