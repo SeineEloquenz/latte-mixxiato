@@ -45,7 +45,7 @@ do
       - mixnet
     volumes:
       - ./coord.json:/opt/app/coord.json
-    command: "$clientIndex"
+    command: "$clientIndex $clientIndex"
     depends_on:
       - coordinator
       - gateway
