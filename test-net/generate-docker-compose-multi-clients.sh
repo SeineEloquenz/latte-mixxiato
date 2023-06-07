@@ -1,7 +1,7 @@
-numClients=$1
+numContainers=$1
 clientsInContainer=$2
-rm generated-docker-compose.yaml
-cat >> generated-docker-compose.yaml << EOF
+rm -f -- multi-clients.yaml
+cat >> multi-clients.yaml << EOF
 services:
   coordinator:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-coordinator:latest
@@ -37,16 +37,16 @@ services:
     - coordinator
     command: "dead-drop 8003"
 EOF
-for clientIndex in $(seq $numClients)
+for clientIndex in $(seq $numContainers)
 do
-  cat >> generated-docker-compose.yaml << EOF
+  cat >> multi-clients.yaml << EOF
   client$clientIndex:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
     networks:
       - mixnet
     volumes:
       - ./coord.json:/opt/app/coord.json
-      - ./run-multiple.sh:/opt/app/run-multiple.sh
+      - ./scripts/run-multiple.sh:/opt/app/run-multiple.sh
     entrypoint: ./run-multiple.sh $clientsInContainer
     depends_on:
       - coordinator
@@ -55,7 +55,7 @@ do
       - dead-drop
 EOF
 done
-cat >> generated-docker-compose.yaml << EOF
+cat >> multi-clients.yaml << EOF
 networks:
   mixnet:
 EOF

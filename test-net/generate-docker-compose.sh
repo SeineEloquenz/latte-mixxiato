@@ -1,6 +1,6 @@
 numClients=$1
-rm generated-docker-compose.yaml
-cat >> generated-docker-compose.yaml << EOF
+rm -f -- many-clients.yaml
+cat >> many-clients.yaml << EOF
 services:
   coordinator:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-coordinator:latest
@@ -38,7 +38,7 @@ services:
 EOF
 for clientIndex in $(seq $numClients)
 do
-  cat >> generated-docker-compose.yaml << EOF
+  cat >> many-clients.yaml << EOF
   client$clientIndex:
     image: registry.mixlab.mondcarion.group/latte-mixxiato-client:latest
     networks:
@@ -53,7 +53,7 @@ do
       - dead-drop
 EOF
 done
-cat >> generated-docker-compose.yaml << EOF
+cat >> many-clients.yaml << EOF
 networks:
   mixnet:
 EOF
